@@ -1,6 +1,8 @@
 package com.ggxiaozhi.lib.class8;
 
-import com.example.lib.lib.class2.Array;
+
+
+import com.ggxiaozhi.lib.class2.Array;
 
 import java.util.Random;
 

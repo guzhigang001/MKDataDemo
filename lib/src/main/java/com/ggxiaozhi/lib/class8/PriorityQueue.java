@@ -1,7 +1,7 @@
 package com.ggxiaozhi.lib.class8;
 
-import com.example.lib.lib.class3.main_5.Queue;
-import com.example.lib.lib.class8.class2_3.MaxHeap;
+
+import com.ggxiaozhi.lib.class3.main_5.Queue;
 
 public class PriorityQueue<E extends Comparable<E>> implements Queue<E> {
 
