@@ -1,6 +1,7 @@
 package com.ggxiaozhi.lib.class12.class2;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -36,6 +37,7 @@ import java.util.List;
  * 1. 一定是出现了添加操作
  * 2. 出现不平衡的位置 一定是出现不平衡的第一个节点的左侧的左侧(这里是A节点出现不平衡 平衡因子为2 是由于添加了C导致的)
  */
+@SuppressWarnings("SuspiciousNameCombination")
 public class AVLTree<K extends Comparable<K>, V> {
     private class Node {
 
@@ -162,9 +164,9 @@ public class AVLTree<K extends Comparable<K>, V> {
         root.height = 1 + Math.max(getHeight(root.left), getHeight(root.right));
 
         int balanceFactor = getBalanceFactor(root);
-        if (Math.abs(balanceFactor) > 1) {
-            System.out.println("unbalanced : " + balanceFactor);
-        }
+//        if (Math.abs(balanceFactor) > 1) {
+//            System.out.println("unbalanced : " + balanceFactor);
+//        }
 
         //平衡二叉树 代码要写在这个位置
         //因为 在递归中 我们是下面的 return root; 一层一层向上返回
@@ -181,6 +183,18 @@ public class AVLTree<K extends Comparable<K>, V> {
          * 那么节点嘴边的BalanceFactor值一定大于0  但是如果remove的时候会出现=0的情况 这里是为了统一代码
          * 如果remove方法用到这里就会有问题 加上也没出出错
          * 集体参考 https://coding.imooc.com/learn/questiondetail/59846.html
+         *
+         */
+        /**
+         * TODO 旋转节点的位置在平衡因子被打破的下一个节点为基准 Y的下一个节点X
+         * LL 进行右旋转
+         * -              y                  x
+         * -            / \               /    \
+         * -           x   T4            z      y
+         * -         / \        右旋转  /  \    / \
+         * -        z  T3       ----->T1  T2  T3  T4
+         * -       / \
+         * -      T1 T2
          */
         if (balanceFactor > 1 && getBalanceFactor(root.left) >= 0) {
             return rightRotate(root);
@@ -190,10 +204,62 @@ public class AVLTree<K extends Comparable<K>, V> {
          * 其他逻辑与上面相同
          */
 
+        /**
+         * //RR 进行右旋转 进行左旋转
+         * //
+         * //       y                             x
+         * //      / \                         /   \
+         * //     T1  x         左旋转         y     z
+         * //        / \      -------->      / \   / \
+         * //       T2  z                   T1 T2 T3 T4
+         * //          / \
+         * //         T3  T4
+         * //
+         */
         if (balanceFactor < -1 && getBalanceFactor(root.right) <= 0) {
-
+            return leftRotate(root);
         }
 
+        /**
+         *
+         * LR    先左旋转 再右旋转
+         * //
+         * //
+         * //           y                         y                          z
+         * //        /    \                    /    \                     /    \
+         * //       x      T4    左旋转       z      T4    右旋转         x      y
+         * //     /  \          ------->    / \           ------>      /  \   /  \
+         * //    T1   z                    x   T3                     T1  T2 T3  T4
+         * //        / \                 /  \
+         * //       T2 T3               T1  T2
+         * //
+         * //
+         */
+
+        if (balanceFactor > 1 && getBalanceFactor(root.left) < 0) {
+            root.left = leftRotate(root.left);
+            return rightRotate(root);
+        }
+        /**
+         * //RL 先右旋转 再左旋转                     这里可以看到经过对x
+         * //                                       的右旋转已经转换成RR的问题了
+         * //
+         * //         y                                y                              z
+         * //      /    \        先右旋转             /  \         左旋转            /   \
+         * //     T1     x      --------->          T1   z        ------>         y     x
+         * //           / \                            /  \                     /  \   / \
+         * //          z   T4                         T2   x                   T1  T2 T3  T4
+         * //        /  \                                 / \
+         * //       T2  T3                               T3  4
+         */
+        if (balanceFactor < -1 && getBalanceFactor(root.right) > 0) {
+            //先右旋转 返回的是旋转后的根节点  所以变换之后我们要用原根节点去接住 旋转之后的根节点
+            root.right = rightRotate(root.right);
+            //再进行左旋转 还是对root的右子树 然后返回
+            return leftRotate(root.right);
+        }
+
+        //平衡因子 =<1 那么就是平衡的直接返回 不平衡 那么经过上面的4个if 转化平衡后向上返回
         return root;
     }
 
@@ -242,8 +308,8 @@ public class AVLTree<K extends Comparable<K>, V> {
         //3.
         y.left = T3;
 
-        y.height = Math.max(getHeight(y.left), getHeight(y.right));
-        x.height = Math.max(getHeight(x.left), getHeight(x.right));
+        y.height = Math.max(getHeight(y.left), getHeight(y.right)) + 1;
+        x.height = Math.max(getHeight(x.left), getHeight(x.right)) + 1;
         return x;
     }
 
@@ -261,15 +327,15 @@ public class AVLTree<K extends Comparable<K>, V> {
     //   T2  z                     T1 T2 T3 T4
     //      / \
     //     T3 T4
-    private Node lefttRotate(Node y) {
+    private Node leftRotate(Node y) {
         Node x = y.right;
         Node T2 = x.left;
 
         x.left = y;
         y.right = T2;
 
-        y.height = Math.max(getHeight(y.left), getHeight(y.right));
-        x.height = Math.max(getHeight(x.left), getHeight(x.right));
+        y.height = Math.max(getHeight(y.left), getHeight(y.right)) + 1;
+        x.height = Math.max(getHeight(x.left), getHeight(x.right)) + 1;
         return x;
     }
 
@@ -309,20 +375,20 @@ public class AVLTree<K extends Comparable<K>, V> {
      * @param root
      * @return
      */
-    private Node removeMin(Node root) {
-        if (root.left == null) {
-            return root;
-        }
-
-        Node node = removeMin(root.left);
-        if (node.right != null) {
-            root.left = node.right;
-            node.right = null;
-            size--;
-        }
-
-        return root;
-    }
+//    private Node removeMin(Node root) {
+//        if (root.left == null) {
+//            return root;
+//        }
+//
+//        Node node = removeMin(root.left);
+//        if (node.right != null) {
+//            root.left = node.right;
+//            node.right = null;
+//            size--;
+//        }
+//
+//        return root;
+//    }
 
 
     /**
@@ -334,8 +400,8 @@ public class AVLTree<K extends Comparable<K>, V> {
      */
     public boolean isBST() {
 
-        if (root == null)
-            throw new IllegalArgumentException("node is null");
+//        if (root == null)//空节点也是BST
+//            throw new IllegalArgumentException("node is null");
         List<K> list = new ArrayList<>();
 
         inOrder(root, list);
@@ -392,7 +458,7 @@ public class AVLTree<K extends Comparable<K>, V> {
 
     /**
      * 删除指定的任意元素
-     *
+     * https://coding.imooc.com/learn/questiondetail/102451.html
      * @return 返回删除元素后新的bst的根
      */
     public Node removeElement(Node root, K key) {
@@ -401,33 +467,74 @@ public class AVLTree<K extends Comparable<K>, V> {
             return null;
         }
 
+        //要返回删除后的根节点的临时存储
+        //因为在节点后可能就会出现平衡被打破
+        //所以我们用个临时的变量进行存储每个要返回上一次递归的根节点前 进行统一处理
+
+        Node retNode;
         if (key.compareTo(root.key) > 0) {//在右子树上
             root.right = removeElement(root.right, key);
-            return root;
+            //删除节点再赋值根节点后  可能平衡被打破了
+            //所以再返回之前要先判断和处理
+            retNode = root;
+
         } else if (key.compareTo(root.key) < 0) {//在左子树上
             root.left = removeElement(root.left, key);
-            return root;
-        } else {//相等
+            retNode = root;
+        } else {//相等   这里不能用if if if 因为之前是直接return了 进入条件语句后就返回了
+            //现在不返回 每次只能进入一个分支 所以要用 if elseif else
             if (root.left == null) {
                 Node rightNode = root.right;
                 root.right = null;
                 size--;
-                return rightNode;
-            }
-            if (root.right == null) {
+                retNode = rightNode;
+            } else if (root.right == null) {
                 Node leftNode = root.left;
                 root.left = null;
                 size--;
-                return leftNode;
+                retNode = leftNode;
+            } else {
+                Node successor = minimum(root.right);
+                //TODO 虽然我们下面进行了同一的处理 但是 再删除removeMin最小值的时候 我们没有去维护是否平衡 所有这里有两个解决方案：
+                //1. 给removeMin添加平衡的代码
+                //2. 直接调用removeElement方法 如下
+                successor.right = removeElement(root.right, successor.key);
+                successor.left = root.left;
+
+                root.left = root.right = null;
+                retNode = successor;
             }
 
-            Node successor = minimum(root.right);
-            successor.right = removeMin(root.right);
-            successor.left = root.left;
 
-            root.left = root.right = null;
-            return successor;
         }
+        //再计算平衡因子的之前 可能要删除的节点是叶子节点 那么我们 获取null节点的retNode.left可能会空指针所以
+        if (retNode == null) {
+            return null;
+        }
+        // 更新height
+        retNode.height = 1 + Math.max(getHeight(retNode.left), getHeight(retNode.right));
+
+        // 计算平衡因子
+        int balanceFactor = getBalanceFactor(retNode);
+
+        // 平衡维护
+        if (balanceFactor > 1 && getBalanceFactor(retNode.left) >= 0)
+            return rightRotate(retNode);
+
+        if (balanceFactor < -1 && getBalanceFactor(retNode.right) <= 0)
+            return leftRotate(retNode);
+
+        if (balanceFactor > 1 && getBalanceFactor(retNode.left) < 0) {
+            retNode.left = leftRotate(retNode.left);
+            return rightRotate(retNode);
+        }
+
+        if (balanceFactor < -1 && getBalanceFactor(retNode.right) > 0) {
+            retNode.right = rightRotate(retNode.right);
+            return leftRotate(retNode);
+        }
+
+        return retNode;
     }
 
     public void set(K key, V newValue) {
@@ -506,8 +613,71 @@ public class AVLTree<K extends Comparable<K>, V> {
 
             System.out.println("is BST " + map.isBST());
             System.out.println("is Balance " + map.isBalance());
+
+            for(String word: words){
+                map.remove(word);
+                if(!map.isBST() || !map.isBalance())
+                    throw new RuntimeException("Error");
+            }
+        }
+
+        System.out.println();
+        System.out.println();
+
+        System.out.println("===================性能测试=====================");
+        performanceTesting();
+    }
+
+    private static void performanceTesting() {
+        System.out.println("Pride and Prejudice");
+
+        ArrayList<String> words = new ArrayList<>();
+        if (FileOperation.readFile("pride-and-prejudice.txt", words)) {
+            System.out.println("Total words: " + words.size());
+
+//            Collections.sort(words);
+
+            // Test BST
+            long startTime = System.nanoTime();
+
+            BST<String, Integer> bst = new BST<>();
+            for (String word : words) {
+                if (bst.contains(word))
+                    bst.set(word, bst.get(word) + 1);
+                else
+                    bst.add(word, 1);
+            }
+
+            for (String word : words)
+                bst.contains(word);
+
+            long endTime = System.nanoTime();
+
+            double time = (endTime - startTime) / 1000000000.0;
+            System.out.println("BST: " + time + " s");
+
+
+            // Test AVL Tree
+            startTime = System.nanoTime();
+
+            AVLTree<String, Integer> avl = new AVLTree<>();
+            for (String word : words) {
+                if (avl.contains(word))
+                    avl.set(word, avl.get(word) + 1);
+                else
+                    avl.add(word, 1);
+            }
+
+            for (String word : words)
+                avl.contains(word);
+
+            endTime = System.nanoTime();
+
+            time = (endTime - startTime) / 1000000000.0;
+            System.out.println("AVL: " + time + " s");
         }
 
         System.out.println();
     }
+
 }
