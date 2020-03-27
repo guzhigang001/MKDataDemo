@@ -230,6 +230,8 @@ public class BST<K extends Comparable<K>, V> {
 //        System.out.println(map.getSize());
 //        System.out.println("Pride and Prejudice");
 //
+
+
         ArrayList<String> words = new ArrayList<>();
         if(FileOperation.readFile("pride-and-prejudice.txt", words)) {
             System.out.println("Total words: " + words.size());

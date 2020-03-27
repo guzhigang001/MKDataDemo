@@ -6,6 +6,26 @@ import java.util.ArrayList;
  * Create by ggxz
  * 2020/3/27
  * description:红黑树
+ * <p>
+ * //红黑树的添加逻辑
+ * // 空节点添加元素 要保持红黑树的性质：根节点是黑节点 所以 新创建的节点默认是红色我们要手动改成黑色：如下：
+ * //
+ * //
+ * //
+ * // 1     2 add z     3    add y       4   左旋转y       5     右旋转x             6    翻转颜色
+ * //xR--->xB----->    xB   ------>     xB  -------->    xB    ---------->         yB    ------->     yR
+ * //                 /      z<y<x     /                /     旋转后要            /  \               /  \        最后我返回的根节点是红色的 这样我们向上回溯递归再返回接入的时候依然满足新接入的节点是红色的
+ * //                zR               zR               yR     y颜色=x.color      zR  xR            zB   xB       root.left = add(root.left, key, value);
+ * //            满足性质不变            \             /       x.color=RED                                       root.right = add(root.right, key, value);
+ * //                                    yR          zR                                                         比如add()方法中的上面2行代码 保证接入添加回溯的节点一定是红色的
+ * //                                                                                                           这样我们可以递归去进入我们处理新的红色节点的方法
+ * //
+ * //
+ * //这里123456 的顺序是不一定的 我们可以一次判断 当添加新的节点(一定是红色的) 满足哪种情况进入哪种分支
+ * //
+ * //
+ * //
+ * //
  */
 @SuppressWarnings("SuspiciousNameCombination")
 public class RBTree<K extends Comparable<K>, V> {
@@ -125,14 +145,12 @@ public class RBTree<K extends Comparable<K>, V> {
      */
     private Node rightRotate(Node y) {
         Node x = y.left;
-        Node T1 = x.right;
-        y.left = T1;
+        y.left = x.right;
         x.right = y;
 
         x.color = y.color;
         y.color = RED;
 
-        flipColors(x);
         return x;
 
     }
@@ -169,6 +187,8 @@ public class RBTree<K extends Comparable<K>, V> {
      */
     private Node add(Node root, K key, V value) {
         if (root == null) {
+            //新添加的节点 一定是红色的
+            // TODO 也就是返回的节点是红色的
             root = new Node(key, value);
             size++;
             return root;
@@ -182,6 +202,21 @@ public class RBTree<K extends Comparable<K>, V> {
             root.value = value;
         }
 
+        //处理节点位置再这里
+        if (isRed(root.right) && !isRed(root.left)) {//4中的情况 root=x
+            root=leftRotate(root);
+        }
+
+        if (isRed(root.left) && !isRed(root.left.left)) {//5中的情况 root=x
+            root=rightRotate(root);
+        }
+
+        if (isRed(root.left)&&isRed(root.right)){//6中的情况 root=y
+            flipColors(root);
+        }
+
+        //上面新建节点是红色的 那我们向上回溯 也要返回根节点是红色的这样再进入循环的时候我们对于
+        //新传来的节点是红色的那么我就可以再次走入上的逻辑去处理
         return root;
     }
 
@@ -339,7 +374,7 @@ public class RBTree<K extends Comparable<K>, V> {
         if (FileOperation.readFile("pride-and-prejudice.txt", words)) {
             System.out.println("Total words: " + words.size());
 
-            BST<String, Integer> map = new BST<>();
+            RBTree<String, Integer> map = new RBTree<>();
             for (String word : words) {
                 if (map.contains(word))
                     map.set(word, map.get(word) + 1);
