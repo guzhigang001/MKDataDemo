@@ -38,7 +38,7 @@ public class BubbleSort {
      *
      * @param arr
      */
-    public static void sort2(Comparable[] arr) {
+    public static Comparable[] sort2(Comparable[] arr) {
 
         int n = arr.length;
         for (int i = 0; i < n - 1; i++) {
@@ -61,10 +61,10 @@ public class BubbleSort {
                 break;
             }
         }
-
+        return arr;
     }
 
-    public static void sort3(Comparable[] arr) {
+    public static Comparable[] sort3(Comparable[] arr) {
 
         int n = arr.length;
         //记录最后一次交换位置的 下标  这样下次我们直接遍历到这里 因为lastIndex之后的都是有序的了
@@ -72,9 +72,9 @@ public class BubbleSort {
         //无序数组的边界 下次遍历直接就遍历到这里就可以了
         int sortBorder = n - 1;
         for (int i = 0; i < n - 1; i++) {
-
             boolean isSort = true;
             for (int j = 0; j < sortBorder; j++) {
+
 
                 if (arr[j].compareTo(arr[j + 1]) > 0) {
                     Comparable temp = arr[j];
@@ -82,17 +82,16 @@ public class BubbleSort {
                     arr[j + 1] = temp;
                     isSort = false;//这个表示位的作用是在于 如果从j=0遍历到最后都是有序的  那么这个数组就是有序的
                     //直接再下面跳出循环
-                    sortBorder = j;
+                    lastIndex = j;
                 }
-
-
             }
-
+            sortBorder = lastIndex;
             if (isSort) {
                 break;
             }
-        }
 
+        }
+        return arr;
     }
 
     private static void swap(Comparable[] arr, int minIndex, int i) {
@@ -102,9 +101,7 @@ public class BubbleSort {
     }
 
     public static void main(String[] args) {
-        Integer[] integers = {3, 5, 4, 8, 2, 1};
-        SortTestHelper.printArray(integers);
-        sort2(integers);
-        SortTestHelper.printArray(integers);
+        Integer[] integers = {3, 5, 4};
+        SortTestHelper.printArray(sort3(integers));
     }
 }

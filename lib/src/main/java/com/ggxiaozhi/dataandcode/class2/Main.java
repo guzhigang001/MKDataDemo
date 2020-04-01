@@ -24,12 +24,13 @@ public class Main {
 
             swap(arr, i, minIndex);
         }
+
     }
 
     private static void swap(Comparable[] arr, int minIndex, int i) {
-        Comparable min = arr[minIndex];
-        arr[minIndex] = arr[i];
-        arr[i] = min;
+        Comparable temp = arr[i];
+        arr[i] = arr[minIndex];
+        arr[minIndex] = temp;
     }
 
     public static void main(String[] args) {
