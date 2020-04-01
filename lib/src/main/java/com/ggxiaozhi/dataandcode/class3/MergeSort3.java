@@ -26,7 +26,6 @@ public class MergeSort3 {
             }
         }
 
-        SortTestHelper.printArray(arr);
 
     }
 

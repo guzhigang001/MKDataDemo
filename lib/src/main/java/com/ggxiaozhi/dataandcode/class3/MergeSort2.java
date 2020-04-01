@@ -24,7 +24,6 @@ public class MergeSort2 {
 
         Comparable[] temp = new Comparable[array.length];
         sort(array, 0, array.length - 1, temp);
-        SortTestHelper.printArray(array);
     }
 
     private static void sort(Comparable[] arr, int l, int r, Comparable[] temp) {
