@@ -1,19 +1,17 @@
 package com.ggxiaozhi.dataandcode.class3;
 
-import com.ggxiaozhi.dataandcode.class2.algo.SortTestHelper;
-import com.sun.javafx.collections.SortHelper;
-
 import java.util.Arrays;
-import java.util.logging.SocketHandler;
 
 /**
  * Create by ggxz
  * 2020/3/31
  * description: 归并排序非递归写法 自下向上
  */
+@SuppressWarnings("unchecked")
 public class MergeSort3 {
 
     /**
+     * https://leetcode-cn.com/problems/sort-list/solution/sort-list-gui-bing-pai-xu-lian-biao-by-jyd/
      * @param arr
      * @param n   数组的长度下标
      */

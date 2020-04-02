@@ -63,7 +63,7 @@ class Solution {
     }
 
     public static void main(String[] args) {
-        ListNode head = new ListNode(new int[]{1, 2, 3, 4});
+        ListNode head = new ListNode(new int[]{1, 2, 3});
         System.out.println(head);
         System.out.println(reverseList(head));
     }

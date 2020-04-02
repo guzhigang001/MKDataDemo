@@ -107,13 +107,13 @@ public class MergeSort {
                 arr[k] = aux[i - l];
                 i++;
             } else //左边<右边  右边大放右边
-                if (aux[i - l].compareTo(aux[j - l]) < 0) {// 左半部分所指元素 < 右半部分所指元素
+                if (aux[i - l].compareTo(aux[j - l]) <= 0) {// 左半部分所指元素 < 右半部分所指元素
 
-                    //右边大 放左边
+                    //右边大 放左边 或是左边和右边相等的时候 放左边 这样也可以保证归并排序的有序性-
                     arr[k] = aux[i - l];
                     i++;
 
-                } else {//左边>右边  左边大 或是左边和右边相等的时候 放左边 这样也可以保证归并排序的有序性
+                } else {//左边>右边  左边大
                     arr[k] = aux[j - l];
                     j++;
                 }
@@ -128,15 +128,51 @@ public class MergeSort {
         // 可以在1秒之内轻松处理100万数量级的数据
         // 注意：不要轻易尝试使用SelectionSort, InsertionSort或者BubbleSort处理100万级的数据
         // 否则，你就见识了O(n^2)的算法和O(nlogn)算法的本质差异：）
-        int N = 100000;
-        Integer[] arr = SortTestHelper.generateNearlyOrderedArray(N, 100);
+//        int N = 100000;
+//        Integer[] arr = SortTestHelper.generateNearlyOrderedArray(N, 100);
+//
+//
+//        SortTestHelper.testSort("com.ggxiaozhi.dataandcode.class3.MergeSort", arr);
+        Comparable[] array = {5, 3, 9, 12, 6, 1, 7, 2, 4, 11, 8, 10};
+        sort(array);
 
-
-        SortTestHelper.testSort("com.ggxiaozhi.dataandcode.class3.MergeSort", arr);
-
-
+        Person person = new Person("a", 4);
+        Person person1 = new Person("b", 2);
+        Person person2 = new Person("c", 1);
+        Person person3 = new Person("d", 4);
+        Comparable[] arr = {person, person1, person2, person3};
+        sort(arr);
+        SortTestHelper.printArray(arr);
         return;
 
 
+    }
+
+    static class Person implements Comparable<Person> {
+        String name;
+        int age;
+
+        public Person(String name, int age) {
+            this.name = name;
+            this.age = age;
+        }
+
+        @Override
+        public String toString() {
+            return "Person{" +
+                    "name='" + name + '\'' +
+                    ", age=" + age +
+                    '}';
+        }
+
+        @Override
+        public int compareTo(Person anOther) {
+            if (this.age > anOther.age) {
+                return 1;
+            } else if (this.age < anOther.age) {
+                return -1;
+            } else
+                return 0;
+        }
     }
 }
