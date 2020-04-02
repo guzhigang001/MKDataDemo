@@ -30,17 +30,15 @@ public class LinkedList<E> {
     }
 
 
-    private Node<E> head;
+    private Node dummyHead;
 
     private int size;
 
-    private Node<E> pre;
 
     public LinkedList() {
 
-        head = null;
+        dummyHead = new Node<>(null, null);
         size = 0;
-        pre = null;
     }
 
 
@@ -54,36 +52,28 @@ public class LinkedList<E> {
 
     public void addFirst(E e) {
 
-        Node<E> node = new Node<>(e);
-        node.next = head;
-        head = node;
-
-        size++;
-
-        //head = new Node(e,head)
+        add(e, 0);
 
     }
 
+    public void addLast(E e) {
+        add(e, size - 1);
+    }
 
     public void add(E e, int index) {
-        if (index >= size || index < 0) {
+        if (index > size || index < 0) {
             throw new IllegalArgumentException("下标越界");
         }
 
-        if (index == 0) {
-            addFirst(e);
-        }
-        pre = head;
-        int tempIndex = 0;
-        for (Node cur = head; cur.next != null; cur = cur.next) {
 
-            if (tempIndex == index) {
-                pre.next = new Node(e, cur);
-                break;
-            }
-            pre = cur;
-            tempIndex++;
+        Node pre = dummyHead;
+        for (int i = 0; i < index; i++) {
+            pre = pre.next;
         }
+
+        pre.next = new Node(e, pre.next);
+
+        size++;
     }
 
     /**
@@ -111,7 +101,7 @@ public class LinkedList<E> {
         Node prev = null;
         Node cur = head;
 
-        while (cur!= null) {
+        while (cur != null) {
             Node temp = cur.next;
             cur.next = prev;
             prev = cur;
@@ -122,11 +112,63 @@ public class LinkedList<E> {
         return prev;
     }
 
+
+    public E get(int index) {
+        if (index >= size || index < 0) {
+            throw new IllegalArgumentException("下标越界");
+        }
+        Node<E> cur = dummyHead.next;
+        for (int i = 0; i < index; i++) {
+            cur = cur.next;
+        }
+
+        return cur.e;
+    }
+
+    public boolean contains(E e) {
+        Node cur = dummyHead.next;
+        for (int i = 0; i < size; i++) {
+            if (cur.e.equals(e)) {
+                return true;
+            }
+            cur = cur.next;
+        }
+
+        return false;
+    }
+
+    public E remove(int index) {
+        if (index >= size || index < 0) {
+            throw new IllegalArgumentException("下标越界");
+        }
+        Node<E> prev = dummyHead;
+        for (int i = 0; i < index; i++) {
+            prev = prev.next;
+        }
+
+        Node<E> del = prev.next;
+        prev.next = prev.next.next;
+        del.next = null;
+        size--;
+        return del.e;
+    }
+
+    public void set(int index, E e) {
+        Node cur = dummyHead.next;
+
+        for (int i = 0; i < index; i++) {
+            cur = cur.next;
+        }
+
+        cur.e = e;
+
+    }
+
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
 
-        for (Node cur = head; cur != null; cur = cur.next) {
+        for (Node cur = dummyHead.next; cur != null; cur = cur.next) {
             builder.append(cur).append("->");
         }
         builder.append("NULL");
@@ -139,10 +181,20 @@ public class LinkedList<E> {
         for (int i = 0; i < 5; i++) {
             linkedList.addFirst(i);
         }
+        System.out.println(linkedList.toString());
+        System.out.println(linkedList.get(0));
+        System.out.println(linkedList.get(linkedList.size - 1));
+        System.out.println(linkedList.contains(0));
+        System.out.println(linkedList.contains(4));
+        System.out.println(linkedList.contains(8));
+        System.out.println(linkedList.contains(9));
         linkedList.add(8, 2);
+        linkedList.addLast(7);
+        System.out.println(linkedList.toString());
+        System.out.println(linkedList.remove(2));
+        linkedList.set(2, -1);
         System.out.println(linkedList.toString());
 
-        System.out.println(linkedList.reverseList(linkedList.head));
-        System.out.println(linkedList);
+
     }
 }
