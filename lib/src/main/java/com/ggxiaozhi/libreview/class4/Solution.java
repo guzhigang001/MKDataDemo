@@ -1,6 +1,8 @@
 package com.ggxiaozhi.libreview.class4;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Stack;
 
@@ -16,53 +18,44 @@ import java.util.Stack;
 @SuppressWarnings("unchecked")
 public class Solution {
 
+    /**
+     * @param nums1
+     * @param nums2
+     * @return
+     */
     public static int[] nextGreaterElement(int[] nums1, int[] nums2) {
 
-        Stack<Integer> stackA = new Stack<>();
-        Stack<Integer> stackB = new Stack<>();
-        for (int i = nums1.length - 1; i >= 0; i--) {
-            stackA.push(nums1[i]);
-        }
+        Stack<Integer> stack = new Stack<>();
+        Map<Integer, Integer> map = new HashMap<>();
+        for (int i = 0; i < nums2.length; i++) {
 
-        for (int i = nums2.length - 1; i >= 0; i--) {
-            stackB.push(nums2[i]);
-        }
-
-
-        int[] ret = new int[nums1.length];
-        int i = 0;
-        while (!stackA.isEmpty()) {
-            Integer popA = stackA.pop();
-            Stack<Integer> temp = (Stack<Integer>) stackB.clone();
-            while (!temp.isEmpty()) {
-                Integer popT = temp.pop();
-                if (popT.equals(popA)) {
-
-
-                    while (!temp.isEmpty()) {
-                        Integer popB = temp.pop();
-                        if (popB > popA) {
-                            ret[i] = popB;
-                            i++;
-                            break;
-                        }
-                    }
-                    if (temp.isEmpty()) {
-                        ret[i] = -1;
-                        i++;
-                        break;
-                    }
-                    break;
-                }
+            while (!stack.isEmpty() && nums2[i] > stack.peek()) {
+                Integer pop = stack.pop();
+                map.put(pop, nums2[i]);
             }
+            stack.push(nums2[i]);
         }
-        return ret;
-}
+
+        while (!stack.isEmpty()) {
+            Integer pop = stack.pop();
+
+            map.put(pop, -1);
+        }
+
+        int[] res = new int[nums1.length];
+        for (int i = 0; i < nums1.length; i++) {
+
+            res[i] = map.get(nums1[i]);
+
+        }
+
+        return res;
+    }
 
     public static void main(String[] args) {
 
-        int[] nums1 = {1, 3, 5, 2, 4}, nums2 = {6, 5, 4, 3, 2, 1, 7};
+        int[] nums1 = {4,1,2}, nums2 = {1,3,4,2};
         String string = Arrays.toString(nextGreaterElement(nums1, nums2));
-        System.out.println();
+        System.out.println(string);
     }
 }

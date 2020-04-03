@@ -75,6 +75,18 @@ public class Solution {
         return newHead;
     }
 
+    public ListNode reverseNode(ListNode head) {
+        if (head == null || head.next == null) {
+            return head;
+        }
+
+        ListNode newHead = reverseNode(head.next);
+
+        head.next.next = head;
+        head.next = null;
+        return newHead;
+    }
+
     public static void main(String[] args) {
 
         List<Integer> list = new ArrayList<>();
@@ -86,7 +98,7 @@ public class Solution {
         ListNode listNode = solution.createListNode(list);
         printListNode(listNode);
 
-        printListNode(solution.reverseList(listNode));
+        printListNode(solution.reverseNode(listNode));
     }
 
 
