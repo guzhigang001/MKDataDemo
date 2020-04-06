@@ -211,6 +211,27 @@ public class BSTMap<K extends Comparable<K>, V> implements Map<K, V> {
             return node;
         }
     }
+    // 判断该二叉树是否是一棵二分搜索树
+    public boolean isBST(){
+
+        ArrayList<K> keys = new ArrayList<>();
+        inOrder(root, keys);
+        for(int i = 1 ; i < keys.size() ; i ++)
+            if(keys.get(i - 1).compareTo(keys.get(i)) > 0)
+                return false;
+        return true;
+    }
+
+    private void inOrder(Node node, ArrayList<K> keys){
+
+        if(node == null)
+            return;
+
+        inOrder(node.left, keys);
+        keys.add(node.key);
+        inOrder(node.right, keys);
+    }
+
 
     @Override
     public int getSize() {

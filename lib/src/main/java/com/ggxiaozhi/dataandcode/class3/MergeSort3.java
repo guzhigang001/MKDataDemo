@@ -68,7 +68,7 @@ public class MergeSort3 {
     }
 
     public static void main(String[] args) {
-//        Comparable[] array = {5, 3, 9, 12, 6, 1, 7, 2, 4, 11, 8, 10};
+        //        Comparable[] array = {5, 3, 9, 12, 6, 1, 7, 2, 4, 11, 8, 10};
         Comparable[] array = {3, 1, 4};
         sort(array, array.length);
     }

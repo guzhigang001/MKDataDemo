@@ -176,6 +176,16 @@ public class AVLTree<K extends Comparable<K>, V> {
          * getBalanceFactor(root.left) >= 0 是判断这个节点的平衡因子被打破是左子树打破的还是右子树打破的
          *
          * 这里的getBalanceFactor(root.left) >= 0 其实可以写成>1 因为在添加的时候是在节点左边的左边
+         *
+         * //TODO 复习中发现之前对 理解的不是很好 之前任务=0不会出现 但是没有说明原因 在复习的时候发下可能出现等于0 如下
+         *  -              y
+         *  -            /
+         *  -           x
+         *  -         / \
+         *  -        z  e
+         *  -  TODO x的平衡是0 对应了上面>=0中的等于0  但是这种情况是不会出现的 因为 出现不平衡的因素有2个 :1 发生添加元素 2.添加前AVL是平衡的
+         *     TODO 那么不管事是添加了e还是z 添加前就已经出现了不平衡 所以=0在 add中是不会出现的
+         *
          * 那么节点左边的BalanceFactor值一定大于0  但是如果remove的时候会出现=0的情况 这里是为了统一代码
          * 如果remove方法用到这里就会有问题 加上也没问题
          * 集体参考 https://coding.imooc.com/learn/questiondetail/59846.html
@@ -273,7 +283,7 @@ public class AVLTree<K extends Comparable<K>, V> {
      * -       / \
      * -      T1 T2
      * <p>
-     * 对于x节点来说 将j进行了右旋转
+     * 对于x节点来说 将y进行了右旋转
      * 这个过程是:
      * 1. 先将T3取出来 用临时变量存起来
      * 2. 然后将y节点整个节点放到x的右子树上

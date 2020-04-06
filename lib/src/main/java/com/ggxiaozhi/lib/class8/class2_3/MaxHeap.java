@@ -75,7 +75,7 @@ public class MaxHeap<E extends Comparable<E>> {
     public E extractMax() {
         //找到最大值用于返回 并且判断异常情况
         E ret = findMax();
-        //将数组中的最后一个元素 也就是完全二叉树最后一个元素 方法堆的最顶端 覆盖掉原来的根
+        //将数组中的最后一个元素 也就是完全二叉树最后一个元素 方到堆的最顶端 覆盖掉原来的根
         //此时原来的根也就删除了
         data.swap(0, data.getSize() - 1);
         //删除最后的节点
@@ -230,6 +230,17 @@ public class MaxHeap<E extends Comparable<E>> {
         }
         array[childIndex] = temp;
     }
+
+    public E replace(E e) {
+        E ret = findMax();
+
+        data.set(0, e);
+
+        siftDown(0);
+        return ret;
+    }
+
+
 
     public static void main(String[] args) {
         int n = 1000000;

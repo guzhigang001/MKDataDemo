@@ -64,6 +64,7 @@ public class BST<E extends Comparable<E>> {
         //非递归
         if (root == null) {
             root = new Node(e);
+            size++;
         } else {
             Node cur = root;
             while (true) {
@@ -447,7 +448,7 @@ public class BST<E extends Comparable<E>> {
             //都没有return返回 走到这里 说明 左右子树都不是空
 
             //最小节点存起来
-            Node successor = minimum(node);
+            Node successor = minimum(node.right);
             successor.right = removeMin(node.right); //查找右子树的最小节点  这里也可以换成查找左子树的最大节点
             successor.left = node.left;
 
@@ -465,8 +466,8 @@ public class BST<E extends Comparable<E>> {
 
         left = maxDepth(root.left, left + 1, right);
         right = maxDepth(root.right, left, right + 1);
-
-        return Math.max(left + 1, right + 1);
+        int maxD = Math.max(left + 1, right + 1);
+        return maxD;
     }
 
     /**
@@ -534,6 +535,8 @@ public class BST<E extends Comparable<E>> {
             bst.add(arr[i]);
         }
         System.out.println(bst);
+
+        System.out.println(bst.getSize());
 
         System.out.println(bst.contains(0));
 
