@@ -33,7 +33,7 @@ public class RBTree<K extends Comparable<K>, V> {
     //新创建的节点 默认是红色的
     //TODO 默认是红色的原因是因为 在红黑树中 新添加的节点经过2-3树的转化 一定是红色的
     private static final boolean RED = true;
-    private static final boolean BLACK = true;
+    private static final boolean BLACK = false;
 
     private class Node {
 
@@ -203,7 +203,7 @@ public class RBTree<K extends Comparable<K>, V> {
         }
 
         //处理节点位置再这里
-        if (isRed(root.right) && !isRed(root.left)) {//4中的情况 root=x
+        if (isRed(root.right) && !isRed(root.left)) {//4的情况 root=x
             root=leftRotate(root);
         }
 
