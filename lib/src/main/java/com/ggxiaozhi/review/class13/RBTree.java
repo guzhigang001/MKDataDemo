@@ -1,6 +1,9 @@
 package com.ggxiaozhi.review.class13;
 
 import com.ggxiaozhi.lib.class12.class2.FileOperation;
+import com.sun.org.apache.regexp.internal.RE;
+
+import org.omg.CORBA.NO_IMPLEMENT;
 
 import java.util.ArrayList;
 
@@ -14,6 +17,7 @@ import java.util.ArrayList;
  * @Version: 1.0
  */
 
+@SuppressWarnings("UnnecessaryLocalVariable")
 public class RBTree<K extends Comparable<K>, V> {
 
     private static final boolean RED = true;
@@ -50,8 +54,8 @@ public class RBTree<K extends Comparable<K>, V> {
         return size == 0;
     }
 
-    private boolean isRed(Node node){
-        if (node==null)
+    private boolean isRed(Node node) {
+        if (node == null)
             return BLACK;
         return node.color;
     }
@@ -59,6 +63,7 @@ public class RBTree<K extends Comparable<K>, V> {
     // 向二分搜索树中添加新的元素(key, value)
     public void add(K key, V value) {
         root = add(root, key, value);
+        root.color = BLACK;
     }
 
     // 向以node为根的二分搜索树中插入元素(key, value)，递归算法
@@ -77,7 +82,58 @@ public class RBTree<K extends Comparable<K>, V> {
         else // key.compareTo(node.key) == 0
             node.value = value;
 
+
+        if (isRed(node.right) && !isRed(node.left)) {
+            node = leftRotate(node);
+        }
+
+        if (isRed(node.left) && isRed(node.left.left)) {
+            node = rightRotate(node);
+        }
+
+        if (isRed(node.left) && isRed(node.right)) {
+            flipColors(node);
+        }
         return node;
+    }
+
+    /**
+     * 红黑树的左旋转 左旋转的前提就是 新插入的红色节点在root右侧的时候
+     * 我们才需要对root进行左旋转
+     *
+     * @return
+     */
+    private Node leftRotate(Node node) {
+        Node x = node.right;
+        Node T2 = x.left;
+        node.right = T2;
+        x.left = node;
+
+        //这里相当于定义 原来的传入的根节点node 的颜色是什么
+        //我们旋转后的新的 根节点x 也要保持这个颜色
+        //同时 定义旋转后的根节点x的左子树是红色的节点
+        //TODO 这里注意 可能原来node节点就是红色的 导致 x 和node都是红色 这个我们不管 也返回x
+        //这里我们不做平衡 只旋转 同时维护旋转本身的颜色
+        x.color = node.color;
+        node.color = RED;
+        return x;
+    }
+
+    private Node rightRotate(Node node) {
+        Node x = node.left;
+        Node T2 = x.right;
+        node.left = T2;
+        x.right = node;
+
+        x.color = node.color;
+        node.color = RED;
+        return x;
+    }
+
+    private void flipColors(Node node) {
+        node.color = RED;
+        node.left.color = BLACK;
+        node.right.color = BLACK;
     }
 
     // 返回以node为根节点的二分搜索树中，key所在的节点

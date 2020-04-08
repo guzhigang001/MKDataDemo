@@ -5,7 +5,8 @@ import java.util.ArrayList;
 /**
  * Create by ggxz
  * 2020/3/27
- * description:红黑树
+ * description:红黑树  具体来说 左倾红黑树和一般的红黑树是一样的 重点在于 一般红黑树的root的左右节点都可以是红色的
+ * //但是我们这里只能是2-3中融合节点的左侧
  * <p>
  * //红黑树的添加逻辑
  * // 空节点添加元素 要保持红黑树的性质：根节点是黑节点 所以 新创建的节点默认是红色我们要手动改成黑色：如下：
@@ -26,6 +27,22 @@ import java.util.ArrayList;
  * //
  * //
  * //
+ * <p>
+ * //TODO 第二遍的理解 这部分还是要再细品
+ * // TODO 关于红黑树 13-7中说明了红黑树和2-3树之间的联系 其实在红黑树中添加元素 就是在2-3树中添加元素
+ * 关键在于我们要维护红黑树的性质 而出现维护性质的时候就是在新节点要插入3节点的时候(其实插入2节点中右子树也是需要变化的 但是因为我们是左倾的红黑树
+ * 所以要维护左倾的性质 所以才旋转，一般的红黑树是左右孩子都可以为红色的)
+ * <p>
+ * 解释迷惑，其实这个是左倾红黑树 规定就是再3节点中
+ * 左面的元素是红色的 同时新添加的节点是红色的原因是，
+ * 一个新添加的节点一定是和一个已经存在的节点融合
+ * ，融合后先取保持红黑树的平衡 再来维护颜色那么添加的颜色定成红色，
+ * 1.是因为融合的原因。 2.主要还是方便处理。
+ * <p>
+ * <p>
+ * //TODO 红黑树与AVL树 稍微 优势的点在于 AVL树 某个节点出现不平衡后 通过旋转保持平衡 然后向上回溯 可能还是不平衡的
+ * // 最坏的情况 可能一直旋转到更节点  而红黑树首先他放松了对平衡因子这要求 那么必然旋转次数也会减少 同时 他最坏为2logn 和AVL logn也是在同一个数量级的
+ * // 所以在插入和删除这种需要大量旋转的操作中 红黑树统计上要比AVL优越
  */
 @SuppressWarnings("SuspiciousNameCombination")
 public class RBTree<K extends Comparable<K>, V> {
@@ -88,6 +105,9 @@ public class RBTree<K extends Comparable<K>, V> {
     }
 
     /**
+     * 红黑树的左旋转 左旋转的前提就是 新插入的红色节点在root右侧的时候
+     * 我们才需要对root进行左旋转
+     * <p>
      * 将传入的节点的右子树向左旋转
      * 这里的左旋转与AVL中的左旋转原理相同
      * 但是我们要注意 旋转后我们要维护node节点和right节点的color
@@ -118,11 +138,17 @@ public class RBTree<K extends Comparable<K>, V> {
         y.right = x.left;
         x.left = y;
 
+        //这里相当于定义 原来的传入的根节点node 的颜色是什么
+        //我们旋转后的新的 根节点x 也要保持这个颜色
+        //同时 定义旋转后的根节点x的左子树是红色的节点
+        //TODO 这里注意 可能原来node节点就是红色的 导致 x 和node都是红色 这个我们不管 也返回x
+        //这里我们不做平衡 只旋转 同时维护旋转本身的颜色
         x.color = y.color;
         y.color = RED;
         return x;
     }
 
+    //向红黑树中添加元素  并保持根节点为黑色
     public void add(K key, V value) {
 
         root = add(root, key, value);
@@ -157,6 +183,10 @@ public class RBTree<K extends Comparable<K>, V> {
 
     /**
      * 翻转颜色
+     * //TODO 复习中，对翻转颜色 新的理解： 对于翻转颜色 首先满足下面的情况
+     * 同时翻转的目的是 对于根节点 在回溯向上递归的时候 相当于 向上融合 也就是根节点再向父节点融合，
+     * 也就相当于向父节点添加一个元素 所以根据我们定好的逻辑 新添加节点的颜色是红色的也满足
+     *
      * <p>
      * //
      * //
@@ -189,9 +219,8 @@ public class RBTree<K extends Comparable<K>, V> {
         if (root == null) {
             //新添加的节点 一定是红色的
             // TODO 也就是返回的节点是红色的
-            root = new Node(key, value);
             size++;
-            return root;
+            return new Node(key, value);
         }
 
         if (key.compareTo(root.key) > 0) {//右子树
@@ -203,15 +232,24 @@ public class RBTree<K extends Comparable<K>, V> {
         }
 
         //处理节点位置再这里
+        //TODO 其实这种情况对应两种 1：当添加的节点等价与2-3树的三节点时 也就是4情况的时候 我们要左旋转，
+        // 同时当添加的节点为2-3树中的2节点的时候 如下：
+        // 也就是根据我们的定义(我们实现的是左倾红黑树) 红色节点只能添加到左侧
+        // B
+        //  \
+        //   R
+        // 这种情况我们也要进行做旋转 所以我们可以直接判断一个节点的右子树是不是红色 如果是 就进行左旋转
+        //
+
         if (isRed(root.right) && !isRed(root.left)) {//4的情况 root=x
-            root=leftRotate(root);
+            root = leftRotate(root);
         }
 
-        if (isRed(root.left) && !isRed(root.left.left)) {//5中的情况 root=x
-            root=rightRotate(root);
+        if (isRed(root.left) && isRed(root.left.left)) {//5中的情况 root=x
+            root = rightRotate(root);
         }
 
-        if (isRed(root.left)&&isRed(root.right)){//6中的情况 root=y
+        if (isRed(root.left) && isRed(root.right)) {//6中的情况 root=y
             flipColors(root);
         }
 

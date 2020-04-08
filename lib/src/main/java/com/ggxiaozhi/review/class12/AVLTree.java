@@ -1,8 +1,10 @@
 package com.ggxiaozhi.review.class12;
 
 import com.ggxiaozhi.lib.class12.class2.FileOperation;
+import com.sun.org.apache.xerces.internal.impl.dv.xs.YearDV;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @Description:
@@ -13,7 +15,7 @@ import java.util.ArrayList;
  * @UpdateRemark: 更新说明
  * @Version: 1.0
  */
-@SuppressWarnings("SuspiciousNameCombination")
+@SuppressWarnings({"SuspiciousNameCombination", "UnnecessaryLocalVariable"})
 public class AVLTree<K extends Comparable<K>, V> {
 
     private class Node {
@@ -50,15 +52,24 @@ public class AVLTree<K extends Comparable<K>, V> {
     // 判断该二叉树是否是一棵二分搜索树
     public boolean isBST() {
 
-        ArrayList<K> keys = new ArrayList<>();
-        inOrder(root, keys);
-        for (int i = 1; i < keys.size(); i++)
-            if (keys.get(i - 1).compareTo(keys.get(i)) > 0)
+//        if (root == null)//空节点也是BST
+//            throw new IllegalArgumentException("node is null");
+        List<K> list = new ArrayList<>();
+
+        inOrder(root, list);
+
+//        if (list.size() > 1) {//如果node不为空 那么至少size=1 1个节点也是BST
+        for (int i = 1; i < list.size(); i++) {
+            if (list.get(i - 1).compareTo(list.get(i)) > 0) {
                 return false;
+            }
+        }
+//        }
+
         return true;
     }
 
-    private void inOrder(Node node, ArrayList<K> keys) {
+    private void inOrder(Node node, List<K> keys) {
 
         if (node == null)
             return;
@@ -96,24 +107,26 @@ public class AVLTree<K extends Comparable<K>, V> {
         return getHeight(node.left) - getHeight(node.right);
     }
 
-    // 判断该二叉树是否是一棵平衡二叉树
-    public boolean isBalanced() {
-        return isBalanced(root);
+    /**
+     * 判断这个二叉树是否是平衡二叉树
+     *
+     * @return
+     */
+    public boolean isBalance() {
+        return isBalance(root);
     }
 
-    // 判断以Node为根的二叉树是否是一棵平衡二叉树，递归算法
-    private boolean isBalanced(Node node) {
-
-        if (node == null)
+    private boolean isBalance(Node node) {
+        if (node == null) {
             return true;
+        }
+
         int balanceFactor = getBalanceFactor(node);
 
         if (Math.abs(balanceFactor) > 1) {
             return false;
         }
-
-        return isBalanced(node.left) && isBalanced(node.right);
-
+        return isBalance(node.left) && isBalance(node.right);
     }
 
     //递归添加节点返回添加后的根节点root
@@ -136,15 +149,149 @@ public class AVLTree<K extends Comparable<K>, V> {
         root.height = 1 + Math.max(getHeight(root.left), getHeight(root.right));
 
         int balanceFactor = getBalanceFactor(root);
-//        if (Math.abs(balanceFactor) > 1) {
-//            System.out.println("unBalanceFactor: " + balanceFactor);
-//        }
 
+
+        //LL
         if (balanceFactor > 1 && getBalanceFactor(root.left) >= 0) {
-            root = rightRotate(root);
+            return rightRotate(root);
+        }
+
+        //RR
+        if (balanceFactor < -1 && getBalanceFactor(root.right) <= 0) {
+            return leftRotate(root);
+        }
+
+        //LR
+        if (balanceFactor > 1 && getBalanceFactor(root.left) < 0) {
+            root.left = leftRotate(root.left);
+
+            return rightRotate(root);
+        }
+
+        //RL
+        if (balanceFactor < -1 && getBalanceFactor(root.right) > 0) {
+            root.right = rightRotate(root.right);
+            root = leftRotate(root);
         }
 
         return root;
+    }
+
+    public Node minimum(Node node) {
+        if (node == null || node.left == null) return node;
+
+        return minimum(node.left);
+
+    }
+
+    /**
+     * 删除 BST中的任意元素 在删除后可以选择右子树的最小值 也可以选择左子树的最大值
+     *
+     * @param key
+     * @return
+     */
+    public V remove(K key) {
+
+        Node node = getNode(root, key);
+        if (node != null) {
+            root = remove(root, key);
+            return node.value;
+        }
+        return null;
+    }
+
+
+    //返回删除指定key节点后的根节点
+    public Node remove(Node node, K key) {
+
+        if (node == null)
+            return null;
+
+        Node retNode;
+        if (node.key.compareTo(key) > 0) {//左子树
+
+            node.left = remove(node.left, key);
+            retNode = node;
+        } else if (node.key.compareTo(key) < 0) {
+            node.right = remove(node.right, key);
+            retNode = node;
+        } else {//相等
+
+            if (node.left == null) {
+
+                Node right = node.right;
+                node.right = null;
+                size--;
+                retNode = right;
+            } else if (node.right == null) {
+
+                Node left = node.left;
+                node.left = null;
+                size--;
+                retNode = left;
+            } else {//左右子树都不为空
+
+                Node successor = minimum(node.right);
+                Node removeRoot = remove(node.right, successor.key);
+                successor.right = removeRoot;
+                successor.left = node.left;
+                node.left = node.right = null;
+
+                retNode = successor;
+
+            }
+        }
+
+        if (retNode == null) {//删除的是叶子节点 下面的代码就不用维护
+            return null;
+        }
+        //由于添加了元素 此时的root节点 高度变化了
+        retNode.height = 1 + Math.max(getHeight(retNode.left), getHeight(retNode.right));
+
+        int balanceFactor = getBalanceFactor(retNode);
+
+
+        //LL
+        if (balanceFactor > 1 && getBalanceFactor(retNode.left) >= 0) {
+            return rightRotate(retNode);
+        }
+
+        //RR
+        if (balanceFactor < -1 && getBalanceFactor(retNode.right) <= 0) {
+            return leftRotate(retNode);
+        }
+
+        //LR
+        if (balanceFactor > 1 && getBalanceFactor(retNode.left) < 0) {
+            retNode.left = leftRotate(retNode.left);
+
+            return rightRotate(retNode);
+        }
+
+        //RL
+        if (balanceFactor < -1 && getBalanceFactor(root.right) > 0) {
+            retNode.right = rightRotate(retNode.right);
+           return leftRotate(retNode);
+        }
+
+        return retNode;
+    }
+
+    /**
+     * 左旋转
+     *
+     * @param y
+     * @return
+     */
+    private Node leftRotate(Node y) {
+        Node x = y.right;
+        Node T2 = x.left;
+        x.left = y;
+        y.right = T2;
+
+        y.height = Math.max(getHeight(y.left), getHeight(y.right))+1;
+        x.height = Math.max(getHeight(x.left), getHeight(x.right))+1;
+        return x;
     }
 
     /**
@@ -159,8 +306,8 @@ public class AVLTree<K extends Comparable<K>, V> {
         x.right = y;
         y.left = T2;
 
-        y.height = Math.max(getHeight(y.left), getHeight(y.right));
-        x.height = Math.max(getHeight(x.left), getHeight(x.right));
+        y.height = Math.max(getHeight(y.left), getHeight(y.right))+1;
+        x.height = Math.max(getHeight(x.left), getHeight(x.right))+1;
 
         return x;
     }
@@ -218,7 +365,13 @@ public class AVLTree<K extends Comparable<K>, V> {
             System.out.println("Frequency of PREJUDICE: " + map.get("prejudice"));
 
             System.out.println("is BST : " + map.isBST());
-            System.out.println("is Balanced : " + map.isBalanced());
+            System.out.println("is Balanced : " + map.isBalance());
+
+            for(String word: words){
+                map.remove(word);
+                if(!map.isBST() || !map.isBalance())
+                    throw new RuntimeException();
+            }
         }
 
         System.out.println();
