@@ -21,6 +21,7 @@ public class ReViewSort {
 //        System.out.println("bubbleSort2:" + Arrays.toString(bubbleSort2(array)));
 //        System.out.println("cocktailSort1:" + Arrays.toString(cocktailSort1(array)));
         System.out.println("shellSort:" + Arrays.toString(shellSort(array)));
+        System.out.println(binarySearch(array, 0,array.length-1,6));
     }
 
     /**
@@ -176,7 +177,7 @@ public class ReViewSort {
                     }
                 }
             } else {
-                for (int j = rightSortBorder; j >leftSortBorder; j--) {
+                for (int j = rightSortBorder; j > leftSortBorder; j--) {
                     if (arr[j] < arr[j - 1]) {
                         int temp = arr[j];
                         arr[j] = arr[j - 1];
@@ -263,10 +264,50 @@ public class ReViewSort {
 
                 while (j - increment >= 0 && arr[j] < arr[j - increment]) {
                     swap(arr, j, j - increment);
-                    j -=  increment;
+                    j -= increment;
                 }
             }
         }
         return arr;
+    }
+
+    /**
+     * 二分查找法
+     */
+    public static int binarySearch(int[] arr, int tag) {
+        int n = arr.length;
+        int l = 0, r = n - 1;
+        while (l <= r) {
+            int mid = l + (r - l) / 2;
+            if (arr[mid] < tag) {
+                l = mid + 1;
+            } else if (arr[mid] > tag) {
+                r = mid - 1;
+            } else {
+                return mid;
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * 二分查找法
+     * //TODO 这里注意二分查找法 递归和非递归中 对于边界的处理 在非递归中 当我们l<=r时 是满足条件的进入循环 也就是最后一个判断的元素
+     * //     当我们递归中不能用l>=r 是因为 我们这样的话 当最后一个元素的时候我们就返回了 这里就相当于漏掉了一个元素 
+     */
+    public static int binarySearch(int[] arr, int l, int r, int tag) {
+
+        if (l > r) {
+            return -1;
+        }
+
+        int mid = l + (r - l) / 2;
+        if (arr[mid] > tag) {
+            return binarySearch(arr, l, mid - 1, tag);
+        } else if (arr[mid] < tag) {
+            return binarySearch(arr, mid + 1, r, tag);
+        } else {
+            return mid;
+        }
     }
 }

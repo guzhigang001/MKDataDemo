@@ -34,7 +34,7 @@ public class QuickSort4 {
     private static void quickSort(Comparable[] arr, int l, int r) {
 
         // 对于小规模数组, 使用插入排序
-        if (r - l <= 15) {
+        if (r - l <= 3) {
             Main5.sort(arr, l, r);
             return;
         }
@@ -50,10 +50,10 @@ public class QuickSort4 {
         int lt = l;
         //[gt...r] >v
         int gt = r + 1;
-        //[lt+1...i-1)=v;
+        //[lt+1...i-1]=v;
         int i = l + 1;
 
-        while (i >= gt) {
+        while (i < gt) {
 
             //arr[i]<v
             if (i <= r && arr[i].compareTo(v) < 0) {
@@ -61,7 +61,7 @@ public class QuickSort4 {
                 i++;
                 lt++;
             } else if (arr[i].compareTo(v) > 0) {
-                swap(arr, i, gt + 1);
+                swap(arr, i, gt - 1);
                 gt--;
             } else {
                 i++;
