@@ -1,6 +1,7 @@
 package com.ggxiaozhi.dataandcode.class3;
 
 import com.ggxiaozhi.dataandcode.class2.SortTestHelper;
+import com.sun.javafx.collections.SortHelper;
 
 import java.util.Arrays;
 
@@ -119,6 +120,7 @@ public class QuickSort {
 //        SortTestHelper.testSort("com.ggxiaozhi.dataandcode.class3.MergeSort", "sort", integers);
         Comparable[] array = {5, 3, 9, 12, 6, 1, 7, 2, 4, 11, 8, 10};
         sort(array);
+        SortTestHelper.printArray(array);
     }
 
 }

@@ -24,7 +24,7 @@ import javafx.util.Pair;
  * <p>
  * 快慢指针 ： 283 27 26 80(88 215)
  * 对撞指针 ： 75 167 (125 344 245 11 )
- * 滑动窗口 ：
+ * 滑动窗口 ： 209 3 (438 76Hard)
  */
 @SuppressWarnings({"MismatchedReadAndWriteOfArray", "StatementWithEmptyBody"})
 public class Solution {
@@ -570,7 +570,7 @@ public class Solution {
 
 
     /**
-     * 209. 长度最小的子数组  更简单的优化 去掉统计和的算法
+     * 209. 长度最小的子数组  更简单的优化 去掉统计和的算法 利用滑动窗口思想
      */
     public static int minSubArrayLen4(int s, int[] nums) {
 
@@ -597,6 +597,102 @@ public class Solution {
         return len;
     }
 
+    /**
+     * 3. 无重复字符的最长子串
+     * 利用滑动窗口思想 l r 范围内最长 无重复字串
+     * 当[l...r]中无重复字串 r++ 一直到r得位置和[l...r-1]中(此时得r的位置和前面的重复了)的‘某一个元素重复了’
+     * 那么l移动到这个重复元素的位置+1 此时[l...r]中还是无重复元素
+     * 那么如何快速判断新增的字符和[l...r]中的字符那个元素重复？
+     * //todo 利用ASCII 码 开辟127个数组 然后每个字符的位置存这个字符出现的频率 如果为为1再出现就是重复的了
+     */
+    public static int lengthOfLongestSubstring(String s) {
+
+        int n = s.length();
+        if (n == 0) {
+            return 0;
+        }
+        int[] acsii = new int[127];
+        int l = 0, r = -1;
+        int maxLen = 1;//无重复的至少为1
+
+        while (l < n) {//TODO 这里理解难点是是当出现重复元素
+            //     l移动到前一个重复元素的+1比如abcb 当r=b时 去掉a,b
+            //     在acsii数组中的值变成0 那么就会进入(r+1 < n && acsii[s.charAt(r + 1)] == 0这个循环
+            //     笔和纸画一下  l++ r不变 什么时候b又==0了呢？就在  l移动到第一个b acsii[s.charAt(l)]--;
+
+            if (r + 1 < n && acsii[s.charAt(r + 1)] == 0) {
+                acsii[s.charAt(r + 1)]++;
+                r++;
+                maxLen = Math.max(r - l + 1, maxLen);//视频优化 测试但不太明显
+            } else {
+                acsii[s.charAt(l)]--;
+                l = l + 1;
+
+            }
+        }
+        return maxLen;
+    }
+
+    /**
+     * 3. 无重复字符的最长子串
+     * 上面的思想 优化：
+     * 1. l++时不去比较 在r++时比较 因为l++的时候时要移动到前一个重复元素的后边
+     * 2. acsii存的时上一个出现元素的下标
+     */
+    public static int lengthOfLongestSubstring2(String s) {
+
+        int n = s.length();
+        if (n == 0) {
+            return 0;
+        }
+        int[] acsii = new int[127];
+        Arrays.fill(acsii, -1);
+        int l = 0, r = 0;//这里用的时0
+        int maxLen = 1;//无重复的至少为1
+        //这种方式相当于快慢指针 r永远在l前面 比如 bb l=0 r=1
+        // 最后l = acsii[s.charAt(r)] + 1=1 还在范围内 但是此时r=-1了 因为acsii[s.charAt(r)] = -1;
+        //但是r++后循环结束 l永远不会大于r 因为r在范围内 那么l一点在范围内
+        while (r < n) {
+
+            if (acsii[s.charAt(r)] == -1) {
+                acsii[s.charAt(r)] = r;
+                maxLen = Math.max(r - l + 1, maxLen);
+                r++;
+            } else {
+                if (acsii[s.charAt(r)] >= l) {//这里要注意 acsii[s.charAt(r)]当获取到上一个重复元素的位置可能比当前的l小
+                    // 这是我们就不处理  比如abba 最后l=2 r=3  a1bba2 此时a重复了 但是l已经=2了就不去处理a1=0的情况
+                    l = acsii[s.charAt(r)] + 1;
+                }
+                acsii[s.charAt(r)] = -1;
+
+            }
+        }
+        return maxLen;
+    }
+
+    /**
+     * 3. 无重复字符的最长子串 利用Map 思路和lengthOfLongestSubstring2一致
+     */
+    public static int lengthOfLongestSubstring3(String s) {
+
+        int n = s.length();
+
+        //Map<当前遍历到的元素，此元素最新的位置>
+        Map<Character, Integer> map = new HashMap<>();
+        int l = 0, r = 0;
+        int maxLen = 0;
+        while (r < n) {
+            char c = s.charAt(r);
+            if (map.containsKey(c)) {
+                l = Math.max(l, map.get(c));
+            }
+            maxLen = Math.max(maxLen, r - l + 1);
+            map.put(c, r);//这里+1其中 key 值为字符，value 值为字符位置 +1，加 1 表示从字符位置后一个才开始不重复 和上面思想一样
+            r++;
+        }
+        return maxLen;
+    }
+
     public static void main(String[] args) {
 
 //        ListNode node4 = new ListNode(-4);
@@ -608,7 +704,7 @@ public class Solution {
 //        System.out.println(detectCycle(node1).val);
         int[] nums = {2, 3, 1, 2, 4, 3};
 //        int[] nums = {1, 4, 4};
-        System.out.println(minSubArrayLen3(10, nums));
+        System.out.println(lengthOfLongestSubstring3("abcabcbb"));
 
 
     }

@@ -135,6 +135,7 @@ public class MergeSort {
 //        SortTestHelper.testSort("com.ggxiaozhi.dataandcode.class3.MergeSort", arr);
         Comparable[] array = {5, 3, 9, 12, 6, 1, 7, 2, 4, 11, 8, 10};
         sort(array);
+        SortTestHelper.printArray(array);
 
         Person person = new Person("a", 4);
         Person person1 = new Person("b", 2);
