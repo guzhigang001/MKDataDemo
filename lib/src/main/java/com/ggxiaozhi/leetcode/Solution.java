@@ -3,6 +3,7 @@ package com.ggxiaozhi.leetcode;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +25,7 @@ import javafx.util.Pair;
  * <p>
  * 快慢指针 ： 283 27 26 80(88 215)
  * 对撞指针 ： 75 167 (125 344 245 11 )
- * 滑动窗口 ： 209 3 (438 76Hard)
+ * 滑动窗口 ： 209 3 219 (217 438 76Hard)
  */
 @SuppressWarnings({"MismatchedReadAndWriteOfArray", "StatementWithEmptyBody"})
 public class Solution {
@@ -693,6 +694,54 @@ public class Solution {
         return maxLen;
     }
 
+    /**
+     * 219. 存在重复元素 II  类似问题217  和上面3号问题做对比
+     * 利用map
+     */
+    public boolean containsNearbyDuplicate(int[] nums, int k) {
+
+        //<出现的元素，这个元素的的下标> 这里注意 key存的是最近一次出现的下标 比如例子中的1231231 当最后一个1的时候是和中间的前一个1比较
+        // 不能是第一个 所以遇见了重复的元素要更新这个元素的下标  所以也不用绝对值了
+        Map<Integer, Integer> map = new HashMap<>();
+
+        for (int i = 0; i < nums.length; i++) {
+
+            int num = nums[i];
+            if (!map.containsKey(num)) {
+                map.put(num, i);
+            } else {
+                if (i - map.get(num) <= k) {
+                    return true;
+                }
+                map.put(num, i);
+            }
+        }
+        return false;
+    }
+
+
+    /**
+     * 219. 存在重复元素 II [1,2,3,1,2,3] 2
+     * set+滑动窗口思想  和上面3号问题做对比 3号问题的滑动窗口不是固定的 这个滑动窗口的长度是固定的 也就set 的size一直是 k+1 1231 k=3 true
+     */
+    public static boolean containsNearbyDuplicate2(int[] nums, int k) {
+
+
+        //遍历nums中范围的值
+        Set<Integer> set = new HashSet<>();
+        for (int i = 0; i < nums.length; i++) {
+            int num = nums[i];
+            if (set.contains(num)) {
+                return true;
+            }
+            set.add(num);
+            if (set.size() == k + 1) {
+                set.remove(nums[i - k]);
+            }
+        }
+        return false;
+    }
+
     public static void main(String[] args) {
 
 //        ListNode node4 = new ListNode(-4);
@@ -704,7 +753,7 @@ public class Solution {
 //        System.out.println(detectCycle(node1).val);
         int[] nums = {2, 3, 1, 2, 4, 3};
 //        int[] nums = {1, 4, 4};
-        System.out.println(lengthOfLongestSubstring3("abcabcbb"));
+        System.out.println(containsNearbyDuplicate2(new int[]{1, 2, 3, 1, 2, 3}, 2));
 
 
     }

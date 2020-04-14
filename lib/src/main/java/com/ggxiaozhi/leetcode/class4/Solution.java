@@ -420,21 +420,61 @@ public class Solution {
         return new ArrayList<>(map.values());
     }
 
+
     /**
      * 447. 回旋镖的数量
+     * <p>
+     * 根据题意 如果a点 到b点和c点的距离相等 那么 abc，acb 是2组 2*(2-1)
+     * 同理 a->bcd  abc acb abd adb acd adc 6组 3*(3-1)
+     * a->bcde  abc acb abd adb abe aeb acd adc ace aec ade aed4*(4-1) 12组
+     * <p>
+     * 这个是求和 2+6+12=20
      */
-    public int numberOfBoomerangs(int[][] points) {
+    public static int numberOfBoomerangs(int[][] points) {
 
+
+        //<点i到其他所有相同点的距离，这个距离下出现的频次>
+        //两点间的距离公司 (x1-x2)^2+(y1-y2)^2结果开根号
+        int res = 0;
+        Map<Integer, Integer> map = new HashMap<>();
         for (int i = 0; i < points.length; i++) {
+            map.clear();//优化避免重复创建
+            //Map<Integer, Integer> map = new HashMap<>();//这里要每次创建map map不能放到外面 否则统计的是2个点的 不是三个点的 //TODO 这里还是没太理解 以后需要多看下
             int[] point = points[i];
+
+            for (int j = 0; j < points.length; j++) {
+                if (i != j) {//取的时候 是和其他点比较所以不和自己再比较了
+                    int dist = distance(point, points[j]);
+                    if (map.containsKey(dist)) {
+                        map.put(dist, map.get(dist) + 1);
+                    } else {
+                        map.put(dist, 1);
+                    }
+                }
+            }
+            for (Integer key : map.keySet()) {
+                if (map.get(key) > 1) {//这里要求的三个点 所以频率如果为1 那么就说明只有一个点和i点相等 不符合要求
+                    Integer value = map.get(key);
+                    res = res + value * (value - 1);
+
+                }
+
+            }
         }
-        return 0;
+
+
+        return res;
     }
 
+    /**
+     * 避免整型溢出 这里不开根号 2个开根号的距离相同 那么不开根号也是相同的
+     */
+    private static int distance(int[] x, int[] y) {
+//        return (x[/**/0] - y[0]) * (x[0] - y[0]) + (x[1] - y[1]) * (x[1] - y[1]);
+       return (int) (Math.pow((x[0] - y[0]), 2) + Math.pow((x[1] - y[1]), 2));
+    }
 
     public static void main(String[] args) {
-        System.out.println(Objects.requireNonNull(groupAnagrams(new String[]{"eat", "tea", "tan", "ate", "nat", "bat"})).toString());
-
-
+        System.out.println(numberOfBoomerangs(new int[][]{{0, 0}, {1, 0}, {2, 0}}));
     }
 }
