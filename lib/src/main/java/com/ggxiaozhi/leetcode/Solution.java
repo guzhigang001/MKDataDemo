@@ -5,10 +5,13 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import javafx.util.Pair;
 
@@ -727,7 +730,7 @@ public class Solution {
     public static boolean containsNearbyDuplicate2(int[] nums, int k) {
 
 
-        //遍历nums中范围的值
+        //遍历nums中范围的值 这里用list 删除元素会错乱
         Set<Integer> set = new HashSet<>();
         for (int i = 0; i < nums.length; i++) {
             int num = nums[i];
@@ -737,6 +740,40 @@ public class Solution {
             set.add(num);
             if (set.size() == k + 1) {
                 set.remove(nums[i - k]);
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 220. 存在重复元素 III
+     * <p>
+     * 这个用map存不行 有重复元素会覆盖  如果创建一个实体 查找匹配就是On 整体On^2
+     * <p>
+     * 这里适合用有序set 因为 num-t<= x <=num+t 这个条件和适合 ceil 和floor
+     *
+     * //t不能为负数 否则没意义
+     * 可以看问答区自己的提问 https://coding.imooc.com/learn/questiondetail/182144.html
+     */
+    public static boolean containsNearbyAlmostDuplicate(int[] nums, int k, int t) {
+
+        if (nums.length == 0)
+            return false;
+
+        TreeSet<Long> set = new TreeSet<>();
+
+        for (int i = 0; i < nums.length; i++) {
+            long num = nums[i];
+
+            //num-t<= x <=num+t 查看是否存在这个x   找到大于 num-t的最小值 同时 这个值在[num-t,num+t]这个范围内就是成功的
+            Long ceiling = set.ceiling((long)num - t);
+
+            if (ceiling != null && ceiling <=(long) num + t)
+                return true;
+
+            set.add(num);
+            if (set.size() == k + 1) {
+                set.remove((long)nums[i - k]);
             }
         }
         return false;
@@ -753,8 +790,16 @@ public class Solution {
 //        System.out.println(detectCycle(node1).val);
         int[] nums = {2, 3, 1, 2, 4, 3};
 //        int[] nums = {1, 4, 4};
-        System.out.println(containsNearbyDuplicate2(new int[]{1, 2, 3, 1, 2, 3}, 2));
+        System.out.println(containsNearbyAlmostDuplicate(new int[]{1, 0, 1, -1}, 2,-2));
 
+        TreeSet<Integer> integers = new TreeSet<>();
+        HashSet<Integer> hashSet = new HashSet<>();
+        for (int i = 0; i < 4; i++) {
+            integers.add(1);
+            hashSet.add(1);
+        }
 
+        System.out.println(integers);
+        System.out.println(hashSet);
     }
 }
