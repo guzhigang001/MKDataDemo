@@ -7,7 +7,7 @@ import java.util.List;
  * 2020/4/15
  * description: 括号里的可以先不做
  * <p>
- * 链表相关问题   83(判断 当时重复元素就删除On) 86(虚拟头节点On)  82 2  21 (445 328) 24
+ * 链表相关问题   83(判断 当时重复元素就删除On) 86(虚拟头节点On)  82 2  21 (445 328 25) 24  147 148
  */
 @SuppressWarnings("ConstantConditions")
 public class Solution {
@@ -152,33 +152,52 @@ public class Solution {
      * // 1  2  3  4  5
      * // p  c
      * // c  p
+     * <p>
+     * //TODO 想法是对的 但是还是对 java的引用不太理解 这个要多复习下
      */
     public static ListNode swapPairs(ListNode head) {
-
-        if (head == null || head.next == null)
-            return head;
 
         ListNode dummy = new ListNode(-1, null);
         dummy.next = head;
 
         ListNode prev = dummy;
-        ListNode cur = dummy.next;
 
-        while (cur != null && cur.next != null) {
-            ListNode temp = cur.next;
-            cur.next = prev;
-            prev.next = temp;
-            cur = temp.next;
-            prev = temp;
+        while (prev.next != null && prev.next.next != null) {//交换的元素是 prev的下一个元素和 下一个元素 如果有一个为null就没办法交换了
+            ListNode node1 = prev.next;
+            ListNode node2 = prev.next.next;
+            ListNode next = node2.next;
+
+            //交换 node1和node2
+            node2.next = node1;
+            node1.next = next;
+            //更新头结点  第一次循环p指向dummy 交换后node2是新的头 所以prev.next = node2;
+
+            prev.next = node2;
+
+            //更新prev的引用(指针) 那么 第一次指向是dummy那么就更新头
+            prev = node1;
         }
-        return dummy.next.next;
+        return dummy.next;
+    }
+
+    /**
+     * 24. 两两交换链表中的节点 递归思想  //TODO 这个需要那纸笔画一下
+     */
+    public static ListNode swapPairs2(ListNode head) {
+        if (head == null || head.next == null)
+            return head;
+
+        ListNode next = head.next;
+        head.next = swapPairs(next.next);
+        next.next = head;
+        return next;
     }
 
     public static void main(String[] args) {
         /**
          * 指针测试
          */
-        ListNode listNode = swapPairs(new ListNode(1, new ListNode(2, new ListNode(3, new ListNode(4, null)))));
+        ListNode listNode = swapPairs2(new ListNode(1, new ListNode(2, new ListNode(3, new ListNode(4, null)))));
         System.out.println(listNode);
 //
 //        ListNode node = new ListNode(1, new ListNode(2, null));

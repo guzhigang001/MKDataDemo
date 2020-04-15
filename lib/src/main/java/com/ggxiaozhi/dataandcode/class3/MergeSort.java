@@ -59,6 +59,8 @@ public class MergeSort {
         int mid = l + (r - l) / 2;
 
 
+        System.out.print(mid+"  ");
+
         // 其实也就是将元数组拆分  具体的排序 在拆分后的返回过程中
         sort(arr, l, mid);
         sort(arr, mid + 1, r);
@@ -95,7 +97,7 @@ public class MergeSort {
         int i = l;
         int j = mid + 1;
 
-        //这里要注意 元数组是[l...mid]或arr[mid+1...r]  这里的l 和mid+1都可能不是0
+        //这里要注意 原数组是[l...mid]或arr[mid+1...r]  这里的l 和mid+1都可能不是0
         //但是我们添加的时候是从0可是添加的 所以在使用 aux的时候要有偏移
         for (int k = l; k <= r; k++) {
 
