@@ -201,7 +201,7 @@ public class Solution {
 
     /**
      * 148. 排序链表
-     *
+     * <p>
      * //         ListNode f = head;
      * //        ListNode s = head;
      * //        ListNode p = head;
@@ -228,7 +228,6 @@ public class Solution {
             slow = slow.next;
             fast = fast.next.next;
         }
-
 
 
         ListNode head2 = slow.next;//归并排序 右边的链表
@@ -290,11 +289,122 @@ public class Solution {
         return size;
     }
 
+
+    /**
+     * 237. 删除链表中的节点
+     * 这里问题的难点在于 不是给你一个头结点 而是直接给你一个待删出的节点
+     * 那么我们就不可以用前prev指针的思想
+     * 所以我们只能用值移动 比如head = [4,5,1,9], node = 5
+     * 我们可以 4119 也就是覆盖
+     * <p>
+     * //TODO 自己一遍思考出来的 加油
+     */
+    public void deleteNode(ListNode node) {
+
+        if (node == null || node.next == null)
+            return;
+
+        node.val = node.next.val;
+        node.next = node.next.next;
+
+    }
+
+    /**
+     * 19. 删除链表的倒数第N个节点
+     * 解题思想就是 创建一个为n的固定长度的滑动窗口
+     * p1指向n的前一个元素间隔n个距离找到p2 然后一起前进
+     * //TODO 自己一遍思考出来的 加油
+     */
+    public static ListNode removeNthFromEnd(ListNode head, int n) {
+
+
+        ListNode dummy = new ListNode(-1);
+        dummy.next = head;
+        ListNode p1 = dummy;
+        ListNode p2 = p1;
+
+        int idx = 0;
+        while (p2 != null) {
+
+            if (n + 1 <= idx) {
+                p1 = p1.next;
+            }
+            p2 = p2.next;
+            idx++;
+        }
+        p1.next = p1.next.next;
+        return dummy.next;
+
+    }
+
+
+    /**
+     * 61. 旋转链表
+     * 给定一个链表，旋转链表，将链表每个节点向右移动 k 个位置，其中 k 是非负数。
+     * <p>
+     * 输入: 1->2->3->4->5->NULL, k = 2
+     * 输出: 4->5->1->2->3->NULL
+     * 解释:
+     * 向右旋转 1 步: 5->1->2->3->4->NULL
+     * 向右旋转 2 步: 4->5->1->2->3->NULL
+     * <p>
+     * 输入: 0->1->2->NULL, k = 4
+     * 输出: 2->0->1->NULL
+     * 解释:
+     * 向右旋转 1 步: 2->0->1->NULL
+     * 向右旋转 2 步: 1->2->0->NULL
+     * 向右旋转 3 步: 0->1->2->NULL
+     * 向右旋转 4 步: 2->0->1->NULL
+     * <p>
+     * 思路
+     * 我们可以先从头遍历 链表 然后让最后一个节点指向头结点 形成一个环  然后我们直接判断从哪里断开链表就可以了
+     * 如何判断的依据是 遍历后我们知道链表的size size-k=n 就是从头遍历到n然后让n的next指向空就好
+     * <p>
+     * 这里可以看到k是可能大于size 有个小技巧 用 k%size 就可以得到k<size
+     * <p>
+     * //TODO 自己一遍思考出来的 加油
+     */
+    public static ListNode rotateRight(ListNode head, int k) {
+
+        if (head == null || head.next == null)
+
+            return head;
+        int size = 1;
+
+        ListNode tail;
+        ListNode temp = head;
+        //这里不能用temp!=null 如果temp指向最后的null
+        //那么下面  tail = temp; 这句就获取不到最后一个节点了
+        while (temp.next != null) {
+            temp = temp.next;
+            size++;
+        }
+        tail = temp;
+        //形成一个环
+        tail.next = head;
+
+        //避免多次旋转调换
+        k = k % size;
+        int n = size - k;
+
+        ListNode cur = head;
+
+        for (int i = 1; i < n; i++) {
+
+            cur = cur.next;
+        }
+        //因为cur.next 是新的头 我们要保存下
+        ListNode newHead = cur.next;
+        cur.next = null;
+
+        return newHead;
+    }
+
     public static void main(String[] args) {
         /**
          * 指针测试
          */
-        ListNode listNode = sortList(new ListNode(3, new ListNode(2, new ListNode(1, new ListNode(4, null)))));
+        ListNode listNode = rotateRight(new ListNode(1, new ListNode(2, new ListNode(3, new ListNode(4, new ListNode(5, null))))), 2);
         System.out.println(listNode);
 //
 //        ListNode node = new ListNode(1, new ListNode(2, null));
@@ -304,5 +414,6 @@ public class Solution {
 //        System.out.println(node.next.val);
 
         System.out.println(getNodeSize(listNode));
+
     }
 }
