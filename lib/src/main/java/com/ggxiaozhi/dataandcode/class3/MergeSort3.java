@@ -17,14 +17,16 @@ public class MergeSort3 {
      */
     public static void sort(Comparable[] arr, int n) {
 
-        for (int sz = 1; sz <= n; sz = sz + sz) {//层级 分几次 logn 也就是2^0 2^1 2^2 2^3 1 2 4 8
-
-            for (int i = 0; i < n; i += sz + sz) {//找出每组的左右边界 i是左边界 每组l的值
+        for (int sz = 1; sz < n; sz = sz + sz) {//层级 分几次 logn 也就是2^0 2^1 2^2 2^3 1 2 4 8
+            // 这里以排序数组7为例子(因为单数比较特殊 这里n=7和n=8一样)
+            // 为什么边界时n-sz呢？ 当sz=1时 分成8份 n-sz=6  那么最后一个l下标是4 最后一个l应该是6 但是7个元素 最后一个不用归并了 推理可使用n=8上面
+            // sz=2 n-sz=5  最后一个l是4
+            // sz=4 n-sz=3  最后一个l是0
+            // sz=8 n-sz=-1 结束排好序
+            for (int i = 0; i < n-sz; i += sz + sz) {//找出每组的左右边界 i是左边界 每组l的值
                 merge(arr, i, i + sz - 1, Math.min(i + sz + sz - 1, n - 1));
             }
         }
-
-
     }
 
 
@@ -68,8 +70,9 @@ public class MergeSort3 {
     }
 
     public static void main(String[] args) {
-        //        Comparable[] array = {5, 3, 9, 12, 6, 1, 7, 2, 4, 11, 8, 10};
+//                Comparable[] array = {5, 3, 9, 12, 6, 1, 7};
         Comparable[] array = {3, 1, 4};
         sort(array, array.length);
+        System.out.println(Arrays.toString(array));
     }
 }

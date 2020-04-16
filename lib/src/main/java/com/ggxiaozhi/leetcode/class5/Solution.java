@@ -19,6 +19,11 @@ public class Solution {
             val = x;
             this.next = next;
         }
+
+        ListNode(int x) {
+            val = x;
+            this.next = null;
+        }
     }
 
     /**
@@ -193,11 +198,103 @@ public class Solution {
         return next;
     }
 
+
+    /**
+     * 148. 排序链表
+     *
+     * //         ListNode f = head;
+     * //        ListNode s = head;
+     * //        ListNode p = head;
+     * //        while (f != null && f.next != null) {
+     * //
+     * //            p = s;
+     * //            s = s.next;
+     * //            f = f.next.next;
+     * //        }
+     * 最后p相当于mid
+     */
+    public static ListNode sortList(ListNode head) {
+
+        if (head == null || head.next == null)
+            return head;
+
+        //快慢指针 找到中间节点，类似于归并排序找mid的过程 fast2步 slow1步
+        //最后fast指向最后一个节点 slow指向中间节点
+        ListNode slow = head;
+        ListNode fast = head.next;//起始的时候 fast比slow快一步
+        //也可以写成注释的样子
+        while (fast != null && fast.next != null) {
+
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+
+
+
+        ListNode head2 = slow.next;//归并排序 右边的链表
+
+        //cut节点 head节点一直到slow节点 成一个新的链表
+        slow.next = null;
+
+        head = sortList(head);
+        head2 = sortList(head2);
+
+        return merge(head, head2);
+
+    }
+
+    private static ListNode merge(ListNode head, ListNode head2) {
+
+
+        ListNode dummyHead = new ListNode(-1);
+
+        ListNode p = dummyHead;//p存储排序后的链表 p的指针指着上一个排好序的节点同时 p.next=null等待接入下一个排序节点
+        ListNode p1 = head;//左边排序链表节点 从头节点一直向后移动
+        ListNode p2 = head2;//右边排序链表节点 从头节点一直向后移动
+        while (true) {
+            if (p1.val > p2.val) {
+                p.next = p2;
+                p = p.next;
+                p2 = p2.next;
+
+                //p.next=null等待接入下一个排序节点
+                p.next = null;
+
+            } else {
+                p.next = p1;
+                p = p.next;
+                p1 = p1.next;
+
+                p.next = null;
+            }
+
+
+            if (p1 == null) {//如果p1=null 说明左边的 宣布排完序了 那么直接p接入右边链表的剩下节点
+                p.next = p2;
+                break;
+            }
+            if (p2 == null) {
+                p.next = p1;
+                break;
+            }
+        }
+
+        return dummyHead.next;
+    }
+
+    private static int getNodeSize(ListNode head) {
+        int size = 0;
+        for (ListNode temp = head; temp != null; temp = temp.next) {
+            size++;
+        }
+        return size;
+    }
+
     public static void main(String[] args) {
         /**
          * 指针测试
          */
-        ListNode listNode = swapPairs2(new ListNode(1, new ListNode(2, new ListNode(3, new ListNode(4, null)))));
+        ListNode listNode = sortList(new ListNode(3, new ListNode(2, new ListNode(1, new ListNode(4, null)))));
         System.out.println(listNode);
 //
 //        ListNode node = new ListNode(1, new ListNode(2, null));
@@ -206,6 +303,6 @@ public class Solution {
 //        System.out.println(temp.val);
 //        System.out.println(node.next.val);
 
-        System.out.println(1 >> 1);
+        System.out.println(getNodeSize(listNode));
     }
 }
