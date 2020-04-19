@@ -1,7 +1,21 @@
 package com.ggxiaozhi.leetcode.class5;
 
+import com.ggxiaozhi.review.class4.LinkedListQueue;
+
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Queue;
 import java.util.Stack;
+import java.util.Vector;
+
+import javafx.util.Pair;
 
 /**
  * Create by ggxz
@@ -631,16 +645,712 @@ public class Solution {
         return stack.pop();
     }
 
+    public static class TreeNode {
+        int val;
+        TreeNode left;
+        TreeNode right;
+
+        TreeNode(int x) {
+            val = x;
+        }
+
+        TreeNode(int x, TreeNode left, TreeNode right) {
+            val = x;
+            this.left = left;
+            this.right = right;
+        }
+    }
+
+    /**
+     * 144. 二叉树的前序遍历
+     * 给定一个二叉树，返回它的 前序 遍历。
+     * <p>
+     * 示例:
+     * <p>
+     * 输入: [1,null,2,3]
+     * 1
+     * \
+     * 2
+     * /
+     * 3
+     * <p>
+     * 输出: [1,2,3]
+     * <p>
+     * 进阶: 递归算法很简单，你可以通过迭代算法完成吗？
+     */
+    public static List<Integer> preorderTraversal(TreeNode root) {
+
+        List<Integer> list = new ArrayList<>();
+        preorderTraversal(root, list);
+
+        return list;
+
+    }
+
+    /**
+     * 递归前序遍历
+     */
+    private static void preorderTraversal(TreeNode root, List<Integer> list) {
+        if (root == null)
+            return;
+        list.add(root.val);
+        preorderTraversal(root.left, list);
+        preorderTraversal(root.right, list);
+    }
+
+
+    /**
+     * 144 非递归
+     */
+    public static List<Integer> preorderTraversal2(TreeNode root) {
+
+        List<Integer> list = new ArrayList<>();
+
+        Stack<TreeNode> stack = new Stack<>();
+        stack.push(root);
+
+        while (!stack.isEmpty()) {
+            TreeNode pop = stack.pop();
+            if (pop == null) {
+                continue;
+            }
+            list.add(pop.val);
+            if (pop.right != null) {
+                stack.push(pop.right);
+            }
+
+            if (pop.left != null) {
+                stack.push(pop.left);
+            }
+        }
+
+        return list;
+    }
+
+
+    /**
+     * 94. 二叉树的中序遍历
+     * <p>
+     * 给定一个二叉树，返回它的中序 遍历。
+     * <p>
+     * 示例:
+     * <p>
+     * 输入: [1,null,2,3]
+     * 1
+     * \
+     * 2
+     * /
+     * 3
+     * <p>
+     * 输出: [1,3,2]
+     * <p>
+     * 进阶: 递归算法很简单，你可以通过迭代算法完成吗？
+     */
+    public List<Integer> inorderTraversal(TreeNode root) {
+
+        List<Integer> list = new ArrayList<>();
+        inorderTraversal(root, list);
+        return list;
+    }
+
+    private void inorderTraversal(TreeNode root, List<Integer> list) {
+
+        if (root == null)
+            return;
+        inorderTraversal(root.left, list);
+        list.add(root.val);
+        inorderTraversal(root.right, list);
+    }
+
+
+    /**
+     * 94. 二叉树的中序遍历
+     * 非递归
+     */
+    public static List<Integer> inorderTraversal2(TreeNode root) {
+
+        if (root == null)
+            return new ArrayList<>();
+        List<Integer> list = new ArrayList<>();
+
+        Stack<TreeNode> stack = new Stack<>();
+        TreeNode cur = root;
+        stack.push(root);
+        while (!stack.isEmpty()) {
+            while (cur.left != null) {
+                stack.push(cur.left);
+                cur = cur.left;
+            }
+            TreeNode pop = stack.pop();
+
+            if (pop != null) {
+                list.add(pop.val);
+                if (pop.right != null) {
+                    stack.push(pop.right);
+                    cur = pop.right;
+                }
+            }
+
+
+        }
+
+        return list;
+    }
+
+    /**
+     * 145. 二叉树的后序遍历
+     * <p>
+     * 递归遍历
+     * <p>
+     * 给定一个二叉树，返回它的 后序 遍历。
+     * <p>
+     * 示例:
+     * <p>
+     * 输入: [1,null,2,3]
+     * 1
+     * \
+     * 2
+     * /
+     * 3
+     * <p>
+     * 输出: [3,2,1]
+     * <p>
+     * 进阶: 递归算法很简单，你可以通过迭代算法完成吗？
+     * <p>
+     */
+    public List<Integer> postorderTraversal(TreeNode root) {
+        if (root == null)
+            return new ArrayList<>();
+        List<Integer> list = new ArrayList<>();
+        postorderTraversal(root, list);
+        return list;
+    }
+
+    private void postorderTraversal(TreeNode root, List<Integer> list) {
+
+        if (root == null) {
+            return;
+        }
+        postorderTraversal(root.left, list);
+        postorderTraversal(root.right, list);
+        list.add(root.val);
+    }
+
+    /**
+     * 后序遍历(非递归算法)
+     * ①先序遍历顺序：根节点-左孩子-右孩子
+     * ②后序遍历顺序：左孩子-右孩子-根节点
+     * ③后序遍历倒过来：根节点-右孩子-左孩子
+     * ①和③对比发现，访问顺序只有左孩子和右孩子颠倒了一下
+     * 思路：
+     * 第一步，将二叉树按照先序非递归算法进行遍历，
+     * 注意在入栈的时候左右孩子入栈的顺序，先左后右 。
+     * 第二步，将遍历得到的结果进行倒置。
+     * <p>
+     * 也可以用队列
+     */
+    public List<Integer> postorderTraversal2(TreeNode root) {
+
+        List<Integer> list = new ArrayList<>();
+
+        Stack<TreeNode> stack = new Stack<>();
+        stack.push(root);
+
+        while (!stack.isEmpty()) {
+            TreeNode pop = stack.pop();
+            if (pop == null) {
+                continue;
+            }
+            list.add(pop.val);
+            if (pop.left != null) {
+                stack.push(pop.left);
+            }
+
+            if (pop.right != null) {
+                stack.push(pop.right);
+            }
+
+
+        }
+
+        Collections.reverse(list);
+        return list;
+    }
+
+    /**
+     * https://leetcode-cn.com/problems/flatten-nested-list-iterator/solution/shen-du-bian-li-java-4ms-by-dong-ci-da-ci-7/
+     * <p>
+     * 341. 扁平化嵌套列表迭代器
+     * <p>
+     * 给你一个嵌套的整型列表。请你设计一个迭代器，使其能够遍历这个整型列表中的所有整数。
+     * <p>
+     * 列表中的每一项或者为一个整数，或者是另一个列表。其中列表的元素也可能是整数或是其他列表。
+     * <p>
+     * <p>
+     * <p>
+     * 示例 1:
+     * <p>
+     * 输入: [[1,1],2,[1,1]]
+     * 输出: [1,1,2,1,1]
+     * 解释: 通过重复调用 next 直到 hasNext 返回 false，next 返回的元素的顺序应该是: [1,1,2,1,1]。
+     * <p>
+     * 示例 2:
+     * <p>
+     * 输入: [1,[4,[6]]]
+     * 输出: [1,4,6]
+     * 解释: 通过重复调用 next 直到 hasNext 返回 false，next 返回的元素的顺序应该是: [1,4,6]。
+     */
+    public static class NestedIterator implements Iterator<Integer> {
+
+        Queue<Integer> queue = new LinkedList<>();
+
+        public NestedIterator(List<NestedInteger> nestedList) {
+
+            for (NestedInteger nestedInteger : nestedList) {
+                separation(nestedInteger);
+            }
+
+        }
+
+        @Override
+        public Integer next() {
+
+            return queue.poll();
+        }
+
+        @Override
+        public boolean hasNext() {
+
+            return !queue.isEmpty();
+        }
+
+        public void separation(NestedInteger nestedList) {
+
+            if (nestedList.isInteger()) {
+                queue.offer(nestedList.getInteger());
+            } else {
+                for (NestedInteger integer : nestedList.getList()) {
+                    separation(integer);
+                }
+            }
+        }
+
+    }
+
+    /**
+     * 341. 扁平化嵌套列表迭代器利用站的思想
+     * 两个栈一个存入 所有元素 开始元素再栈低
+     * 最后元素再栈定
+     * <p>
+     * 第二个栈是用来存数字 将第一个栈取出来 顺序就变成正序了
+     */
+    public static class NestedIterator2 implements Iterator<Integer> {
+
+        //存入所有元素
+        Stack<NestedInteger> mainStack = new Stack<>();
+        //存入int数据 正序输出
+        Stack<Integer> intStack = new Stack<>();
+
+        public NestedIterator2(List<NestedInteger> nestedList) {
+
+            for (NestedInteger nestedInteger : nestedList) {
+                mainStack.push(nestedInteger);
+            }
+
+            separation(mainStack);
+        }
+
+        private void separation(Stack<NestedInteger> mainStack) {
+
+            while (!mainStack.isEmpty()) {
+                NestedInteger pop = mainStack.pop();
+                if (pop.isInteger()) {
+                    intStack.push(pop.getInteger());
+                } else {
+                    for (NestedInteger integer : pop.getList()) {
+                        mainStack.push(integer);
+                    }
+                }
+            }
+        }
+
+        @Override
+        public Integer next() {
+
+            return intStack.pop();
+        }
+
+        @Override
+        public boolean hasNext() {
+
+            return !intStack.isEmpty();
+        }
+
+
+    }
+
+    public interface NestedInteger {
+
+        // @return true if this NestedInteger holds a single integer, rather than a nested list.
+        public boolean isInteger();
+
+        // @return the single integer that this NestedInteger holds, if it holds a single integer
+        // Return null if this NestedInteger holds a nested list
+        public Integer getInteger();
+
+        // @return the nested list that this NestedInteger holds, if it holds a nested list
+        // Return null if this NestedInteger holds a single integer
+        public List<NestedInteger> getList();
+    }
+
+
+    /**
+     * 102. 二叉树的层序遍历
+     * <p>
+     * 给你一个二叉树，请你返回其按 层序遍历 得到的节点值。 （即逐层地，从左到右访问所有节点）。
+     * <p>
+     * <p>
+     * <p>
+     * 示例：
+     * 二叉树：[3,9,20,null,null,15,7],
+     * <p>
+     * 3
+     * / \
+     * 9  20
+     * /  \
+     * 15   7
+     * <p>
+     * 返回其层次遍历结果：
+     * <p>
+     * [
+     * [3],
+     * [9,20],
+     * [15,7]
+     * ]
+     * <p>
+     * <p>
+     * 思路：
+     * 这个每一层是一组 那么我们就要判断每每个元素处于那一层
+     * 所以我们利用层序遍历 将每一次全部放进队列 然后 全部取出 再将下一层全部放入 全部取出的数据就是当前层的数据
+     */
+    public List<List<Integer>> levelOrder(TreeNode root) {
+
+        if (root == null)
+            return new ArrayList<>();
+
+        //用于返回
+        List<List<Integer>> res = new ArrayList<>();
+        Queue<TreeNode> queue = new LinkedList<>();
+
+        queue.offer(root);
+
+        while (!queue.isEmpty()) {
+
+            int size = queue.size();
+            List<Integer> list = new ArrayList<>();
+
+            for (int i = 0; i < size; i++) {
+                TreeNode node = queue.poll();
+                list.add(node.val);
+
+                if (node.left != null) {
+                    queue.offer(node.left);
+                }
+                if (node.right != null) {
+                    queue.offer(node.right);
+                }
+            }
+            res.add(list);
+        }
+
+        return res;
+    }
+
+    /**
+     * 102. 二叉树的层序遍历
+     */
+    public List<List<Integer>> levelOrder2(TreeNode root) {
+
+        if (root == null)
+            return new ArrayList<>();
+
+        //用于返回
+        List<List<Integer>> res = new ArrayList<>();
+        Queue<TreeNode> queue = new LinkedList<>();
+
+        queue.offer(root);
+
+        while (!queue.isEmpty()) {
+
+            int size = queue.size();
+            List<Integer> list = new ArrayList<>();
+
+            for (int i = 0; i < size; i++) {
+                TreeNode node = queue.poll();
+                list.add(node.val);
+
+                if (node.left != null) {
+                    queue.offer(node.left);
+                }
+                if (node.right != null) {
+                    queue.offer(node.right);
+                }
+            }
+            res.add(list);
+        }
+
+        return res;
+    }
+
+    /**
+     * 111. 二叉树的最小深度
+     * <p>
+     * 给定一个二叉树，找出其最小深度。
+     * <p>
+     * 最小深度是从根节点到最近叶子节点的最短路径上的节点数量。
+     * <p>
+     * 说明: 叶子节点是指没有子节点的节点。
+     * <p>
+     * 示例:
+     * <p>
+     * 给定二叉树 [3,9,20,null,null,15,7],
+     * <p>
+     * 3
+     * / \
+     * 9  20
+     * /  \
+     * 15   7
+     * <p>
+     * 返回它的最小深度  2.
+     */
+    public static int minDepth(TreeNode root) {
+
+        if (root == null)
+            return 0;
+        if (root.left == null && root.right == null) {
+            return 1;
+        }
+
+        int min_depth = Integer.MAX_VALUE;
+        if (root.left != null) {
+            min_depth = Math.min(minDepth(root.left), min_depth);
+
+        }
+        if (root.right != null) {
+            min_depth = Math.min(minDepth(root.right), min_depth);
+        }
+        return min_depth + 1;
+    }
+
+
+    /**
+     * 226. 翻转二叉树
+     * <p>
+     * 翻转一棵二叉树。
+     * <p>
+     * 示例：
+     * <p>
+     * 输入：
+     * <p>
+     * 4
+     * /   \
+     * 2     7
+     * / \   / \
+     * 1   3 6   9
+     * <p>
+     * 输出：
+     * <p>
+     * 4
+     * /   \
+     * 7     2
+     * / \   / \
+     * 9   6 3   1
+     * <p>
+     * 备注:
+     * 这个问题是受到 Max Howell 的 原问题 启发的 ：
+     * <p>
+     * 谷歌：我们90％的工程师使用您编写的软件(Homebrew)，但是您却无法在面试时在白板上写出翻转二叉树这道题，这太糟糕了。
+     */
+    public TreeNode invertTree(TreeNode root) {
+
+        if (root == null || (root.left == null && root.right == null))
+            return root;
+        TreeNode right = root.right;
+        TreeNode left = root.left;
+        root.left = right;
+        root.right = left;
+        invertTree(root.left);
+        invertTree(root.right);
+        return root;
+    }
+
+    /**
+     * 100. 相同的树
+     * <p>
+     * 给定两个二叉树，编写一个函数来检验它们是否相同。
+     * <p>
+     * 如果两个树在结构上相同，并且节点具有相同的值，则认为它们是相同的。
+     * <p>
+     * 示例 1:
+     * <p>
+     * 输入:       1         1
+     * / \       / \
+     * 2   3     2   3
+     * <p>
+     * [1,2,3],   [1,2,3]
+     * <p>
+     * 输出: true
+     * <p>
+     * 示例 2:
+     * <p>
+     * 输入:      1          1
+     * /           \
+     * 2             2
+     * <p>
+     * [1,2],     [1,null,2]
+     * <p>
+     * 输出: false
+     * <p>
+     * 示例 3:
+     * <p>
+     * 输入:       1         1
+     * / \       / \
+     * 2   1     1   2
+     * <p>
+     * [1,2,1],   [1,1,2]
+     * <p>
+     * 输出: false
+     */
+    public boolean isSameTree(TreeNode p, TreeNode q) {
+
+        if (p == null && q == null)
+            return true;
+        else {
+            if (p == null || q == null) {
+                return false;
+            } else {
+                if (p.val == q.val) {
+                    return (isSameTree(p.left, q.left)) && isSameTree(p.right, q.right);
+                } else
+                    return false;
+            }
+
+        }
+    }
+
+    /**
+     * 101. 对称二叉树
+     * <p>
+     * 给定一个二叉树，检查它是否是镜像对称的。
+     * <p>
+     * <p>
+     * <p>
+     * 例如，二叉树 [1,2,2,3,4,4,3] 是对称的。
+     * <p>
+     * 1
+     * / \
+     * 2   2
+     * / \ / \
+     * 3  4 4  3
+     * <p>
+     * <p>
+     * <p>
+     * 但是下面这个 [1,2,2,null,3,null,3] 则不是镜像对称的:
+     * <p>
+     * 1
+     * / \
+     * 2   2
+     * \   \
+     * 3    3
+     * <p>
+     * <p>
+     * <p>
+     * 进阶：
+     * <p>
+     * 你可以运用递归和迭代两种方法解决这个问题吗？
+     * 将左子树 或者右子树翻转 然后判断两个数是否是相同的数
+     */
+    public boolean isSymmetric(TreeNode root) {
+
+        if (root == null)
+            return true;
+        if (root.left != null && root.right != null) {
+            TreeNode invertTree = invertTree(root.left);
+            return isSameTree(invertTree, root.right);
+        } else {
+            return root.left == null && root.right == null;
+        }
+    }
+
+    /**
+     * 101. 对称二叉树
+     * <p>
+     * 非递归遍历
+     * 利用二叉树的层序遍历
+     * 再利用双端对列 比较首尾元素是否相等 相等出队 再成对比较
+     */
+    public static boolean isLeft = false;
+
+    public static boolean isSymmetric2(TreeNode root) {
+
+        if (root == null)
+            return true;
+        if (root.right == null && root.left == null)
+            return true;
+        if (root.left == null || root.right == null)
+            return false;
+        Deque<Pair<TreeNode, Boolean>> deque = new LinkedList<>();
+        Pair<TreeNode, Boolean> pairL = new Pair<>(root.left, true);
+        Pair<TreeNode, Boolean> pairR = new Pair<>(root.right, false);
+
+
+        deque.add(pairL);
+        deque.add(pairR);
+
+        while (!deque.isEmpty()) {
+            List<Pair<TreeNode, Boolean>> list = new ArrayList<>(deque);
+
+            if (deque.size() % 2 != 0)//因为是成对出现的 队列里面的数一定是偶数如果不是那么就不用判断了 就是false
+                return false;
+            while (!deque.isEmpty()) {
+                Pair<TreeNode, Boolean> t1 = deque.removeFirst();
+                Pair<TreeNode, Boolean> t2 = deque.removeLast();
+
+                TreeNode first = t1.getKey();
+                TreeNode last = t2.getKey();
+                if (first == null && last == null) {
+                    continue;
+                }
+                if (first == null || last == null)
+                    return false;
+                if (first.val != last.val)
+                    return false;
+                if (first.val==last.val){
+                    if (t1.getValue() && t2.getValue())
+                        return false;
+                    if (!t1.getValue() && !t2.getValue())
+                        return false;
+                }
+
+            }
+            for (int i = 0; i < list.size(); i++) {
+                Pair<TreeNode, Boolean> pair = list.get(i);
+                if (pair.getKey().left != null)
+                    deque.add(new Pair<TreeNode, Boolean>(pair.getKey().left, true));
+                if (pair.getKey().right != null)
+                    deque.add(new Pair<TreeNode, Boolean>(pair.getKey().right, false));
+
+            }
+        }
+        return true;
+    }
+
+
     public static void main(String[] args) {
 
         boolean b = isPalindrome(new ListNode(1, new ListNode(1, new ListNode(2, new ListNode(1, null)))));
         System.out.println(b);
-//
-//        ListNode node = new ListNode(1, new ListNode(2, null));
-//        ListNode temp = node.next;
-//        node.next = null;
-//        System.out.println(temp.val);
-//        System.out.println(node.next.val);
+        isSymmetric2(new TreeNode(1, new TreeNode(2, new TreeNode(3), new TreeNode(4)), new TreeNode(2, new TreeNode(4), new TreeNode(3))));
 
 
     }
