@@ -23,6 +23,10 @@ import javafx.util.Pair;
  * description: 括号里的可以先不做
  * <p>
  * 链表相关问题   83(判断 当时重复元素就删除On) 86(虚拟头节点On)  82 2  21 (445 328 25) 24  147 148
+ * (129 113)
+ * <p>
+ * //TODO 437递归题解 解释递归的含义：
+ * 递归的一个重要思想就是两部分：1.找到最简单的子问题求解，2.其他问题不考虑内在细节，只考虑整体逻辑
  */
 @SuppressWarnings("ConstantConditions")
 public class Solution {
@@ -1288,9 +1292,11 @@ public class Solution {
      * 非递归遍历
      * 利用二叉树的层序遍历
      * 再利用双端对列 比较首尾元素是否相等 相等出队 再成对比较
+     * <p>
+     * 这种丢列的思想 实验后发现还是有问题
+     * 这种做法丢失了 左右孩子的衔接性
+     * 具体错误用例和错误原因 参考   https://coding.imooc.com/learn/questiondetail/183123.html
      */
-    public static boolean isLeft = false;
-
     public static boolean isSymmetric2(TreeNode root) {
 
         if (root == null)
@@ -1325,7 +1331,7 @@ public class Solution {
                     return false;
                 if (first.val != last.val)
                     return false;
-                if (first.val==last.val){
+                if (first.val == last.val) {
                     if (t1.getValue() && t2.getValue())
                         return false;
                     if (!t1.getValue() && !t2.getValue())
@@ -1345,13 +1351,291 @@ public class Solution {
         return true;
     }
 
+    /**
+     * 101. 对称二叉树
+     * <p>
+     * 非递归遍历
+     * 利用二叉树的层序遍历
+     * 再利用队列 分别将下层的相同位置的左孩子和有孩子比较
+     */
+
+    public static boolean isSymmetric3(TreeNode root) {
+
+        if (root == null)
+            return true;
+        if (root.right == null && root.left == null)
+            return true;
+        if (root.left == null || root.right == null)
+            return false;
+        Queue<TreeNode> queue = new LinkedList<>();
+
+        queue.add(root.left);
+        queue.add(root.right);
+        while (!queue.isEmpty()) {
+
+            TreeNode p1 = queue.poll();
+            TreeNode p2 = queue.poll();
+
+            if (p1 == null && p2 == null) {
+                continue;
+            }
+            if (p1 == null || p2 == null)
+                return false;
+            if (p1.val != p2.val)
+                return false;
+
+            //这个顺序是不能乱的
+            queue.offer(p1.left);
+            queue.offer(p2.right);
+            queue.offer(p1.right);
+            queue.offer(p2.left);
+        }
+
+        return true;
+    }
+
+    /**
+     * 112. 路径总和
+     * <p>
+     * 给定一个二叉树和一个目标和，判断该树中是否存在根节点到叶子节点的路径，这条路径上所有节点值相加等于目标和。
+     * <p>
+     * 说明: 叶子节点是指没有子节点的节点。
+     * <p>
+     * 示例:
+     * 给定如下二叉树，以及目标和 sum = 22，
+     * <p>
+     * 5
+     * / \
+     * 4   8
+     * /   / \
+     * 11  13  4
+     * /  \      \
+     * 7    2      1
+     * <p>
+     * 返回 true, 因为存在目标和为 22 的根节点到叶子节点的路径 5->4->11->2。
+     * <p>
+     * <p>
+     * <p>
+     * 思路：
+     * 就是向左右子树找 sum-root.val 一直找到叶子节点 看是否存在
+     */
+    public boolean hasPathSum(TreeNode root, int sum) {
+
+        if (root == null)
+            return false;
+        if (root != null && (root.left == null && root.right == null)) {
+            return root.val == sum;
+        }
+        boolean l = false;
+        if (root.left != null) {
+            l = hasPathSum(root.left, sum - root.val);
+        }
+        boolean r = false;
+        if (root.right != null) {
+            r = hasPathSum(root.right, sum - root.val);
+        }
+        return l || r;
+
+    }
+
+    /**
+     * 257. 二叉树的所有路径
+     * <p>
+     * 给定一个二叉树，返回所有从根节点到叶子节点的路径。
+     * <p>
+     * 说明: 叶子节点是指没有子节点的节点。
+     * <p>
+     * 示例:
+     * <p>
+     * 输入:
+     * <p>
+     * 1
+     * /   \
+     * 2     3
+     * \
+     * 5
+     * <p>
+     * 输出: ["1->2->5", "1->3"]
+     * <p>
+     * 解释: 所有根节点到叶子节点的路径为: 1->2->5, 1->3
+     * <p>
+     * 思路：
+     * 玄幻遍历左右子数 判断是否是叶子节点
+     */
+    public List<String> binaryTreePaths(TreeNode root) {
+
+        List<String> list = new ArrayList<>();
+
+
+        binaryTreePaths(root, list, "");
+        return list;
+    }
+
+    private void binaryTreePaths(TreeNode root, List<String> list, String paths) {
+        if (root == null)
+            return;
+        if (root.left == null && root.right == null) {
+
+            paths += "" + root.val;
+            list.add(paths);
+            return;
+        }
+
+        paths += root.val + "->";
+        binaryTreePaths(root.left, list, paths);
+        binaryTreePaths(root.right, list, paths);
+    }
+
+    /**
+     * 437. 路径总和 III
+     * <p>
+     * //TODO 课程问题
+     * <p>
+     * <p>
+     * 给定一个二叉树，它的每个结点都存放着一个整数值。
+     * <p>
+     * 找出路径和等于给定数值的路径总数。
+     * <p>
+     * 路径不需要从根节点开始，也不需要在叶子节点结束，但是路径方向必须是向下的（只能从父节点到子节点）。
+     * <p>
+     * 二叉树不超过1000个节点，且节点数值范围是 [-1000000,1000000] 的整数。
+     * <p>
+     * 示例：
+     * <p>
+     * root = [10,5,-3,3,2,null,11,3,-2,null,1], sum = 8
+     * <p>
+     * 10
+     * /  \
+     * 5   -3
+     * / \    \
+     * 3   2   11
+     * / \   \
+     * 3  -2   1
+     * <p>
+     * 返回 3。和等于 8 的路径有:
+     * <p>
+     * 1.  5 -> 3
+     * 2.  5 -> 2 -> 1
+     * 3.  -3 -> 11
+     * <p>
+     * 解题思路
+     * 题解
+     * <p>
+     * 本题需要去计算路径和等于给定数值的路径总数，我们依旧遵循树模型的解题思路，按照递归的方式去求解（递归的一个重要思想就是两部分：1.找到最简单的子问题求解，2.其他问题不考虑内在细节，只考虑整体逻辑），那我们现在来设计递归关系：
+     * <p>
+     * 首先，最简单的子问题是什么呢？由于这道题是在树的框架下，我们最容易想到的就是遍历的终止条件：
+     * <p>
+     * if(root == null){
+     * return 0;
+     * }
+     * <p>
+     * 接下来，我们来考虑再上升的一个层次，题目要求 路径不需要从根节点开始，也不需要在叶子节点结束，但是路径方向必须是向下的（只能从父节点到子节点） 。这就要求我们只需要去求三部分即可：
+     * <p>
+     * 以当前节点作为头结点的路径数量
+     * 以当前节点的左孩子作为头结点的路径数量
+     * 以当前节点的右孩子作为头结点啊路径数量
+     * <p>
+     * 将这三部分之和作为最后结果即可。
+     * <p>
+     * 最后的问题是：我们应该如何去求以当前节点作为头结点的路径的数量？这里依旧是按照树的遍历方式模板，每到一个节点让sum-root.val，并判断sum是否为0，如果为零的话，则找到满足条件的一条路径。
+     * <p>
+     * 链接：https://leetcode-cn.com/problems/path-sum-iii/solution/437lu-jing-zong-he-iii-di-gui-fang-shi-by-ming-zhi/
+     */
+    //返回 以root为节点的路径个数
+    public int pathSum(TreeNode root, int sum) {//这个解题的代码思想就是 ，以当前节点为root节点 ，从这个节点开始向下找
+        //看是否有这个节点 和上一题不同的是 我们不用找到叶子节点返回，这里是我们找到了也不返回 因为这个题中存在负数 可能sum为8 我们找到了8
+        // 8+(-a)+(a)=8 所以我们找到了也不返回
+
+        if (root == null)
+            return 0;
+        int res = 0;
+
+        //返回以root为节点 存在sum的和的路径个数
+        res = findPath(root, sum);
+        //这里res可能有 可能没有 不过没关系 没有我们就看下一个节点 看看是否能找到
+        //符合题意得路径
+        res += pathSum(root.left, sum);
+        res += pathSum(root.right, sum);
+        return res;
+    }
+
+    //找到以root为节点的和为sum的路径个数
+    private int findPath(TreeNode root, int sum) {
+        if (root == null)
+            return 0;
+
+        int res = 0;
+        if (root.val == sum) {
+            res += 1;
+        }
+
+        res += findPath(root.left, sum - root.val);
+        res += findPath(root.right, sum - root.val);
+        return res;
+    }
+
+    /**
+     * 235. 二叉搜索树的最近公共祖先
+     * <p>
+     * 给定一个二叉搜索树, 找到该树中两个指定节点的最近公共祖先。
+     * <p>
+     * 百度百科中最近公共祖先的定义为：“对于有根树 T 的两个结点 p、q，最近公共祖先表示为一个结点 x，满足 x 是 p、q 的祖先且 x 的深度尽可能大（一个节点也可以是它自己的祖先）。”
+     * <p>
+     * 例如，给定如下二叉搜索树:  root = [6,2,8,0,4,7,9,null,null,3,5]
+     * <p>
+     * <p>
+     * <p>
+     * 示例 1:
+     * <p>
+     * 输入: root = [6,2,8,0,4,7,9,null,null,3,5], p = 2, q = 8
+     * 输出: 6
+     * 解释: 节点 2 和节点 8 的最近公共祖先是 6。
+     * <p>
+     * 示例 2:
+     * <p>
+     * 输入: root = [6,2,8,0,4,7,9,null,null,3,5], p = 2, q = 4
+     * 输出: 2
+     * 解释: 节点 2 和节点 4 的最近公共祖先是 2, 因为根据定义最近公共祖先节点可以为节点本身。
+     * <p>
+     * <p>
+     * <p>
+     * 说明:
+     * <p>
+     * 所有节点的值都是唯一的。
+     * p、q 为不同节点且均存在于给定的二叉搜索树中。
+     * <p>
+     * //TODO BST 概念还是不熟悉 算法也要多练习BST相关的额
+     * //这个问题在于 如果PQ 在root两侧 那么root就是最小公共节点这一个定理
+     */
+    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+
+        if (root == null || root == p || root == q) {// 1. 其中一个为父亲节点得情况
+            return root;
+        }
+
+        if ((root.val > p.val && root.val < q.val)||(root.val < p.val && root.val > q.val)) {//4. 如果PQ 再root两侧 那么root就是最小公共节点 返回
+            return root;
+        }
+
+        if (root.val > p.val && root.val > q.val) {//2. 都在左侧 难么继续调用
+            return lowestCommonAncestor(root.left, p, q);//去左子树去找
+        }else {//root.val < p.val && root.val < q.val 3 都在右子树 那么去右子树去找。
+            return lowestCommonAncestor(root.right, p, q);
+        }
+    }
 
     public static void main(String[] args) {
 
-        boolean b = isPalindrome(new ListNode(1, new ListNode(1, new ListNode(2, new ListNode(1, null)))));
-        System.out.println(b);
-        isSymmetric2(new TreeNode(1, new TreeNode(2, new TreeNode(3), new TreeNode(4)), new TreeNode(2, new TreeNode(4), new TreeNode(3))));
+//        boolean b = isPalindrome(new ListNode(1, new ListNode(1, new ListNode(2, new ListNode(1, null)))));
+//        System.out.println(b);
+//        isSymmetric3(new TreeNode(1, new TreeNode(2, new TreeNode(3), new TreeNode(4)), new TreeNode(2, new TreeNode(4), new TreeNode(3))));
 
+        StringBuilder builder = new StringBuilder();
+        builder.append("aa").append("bb");
+        System.out.println(builder.length());
+        builder.delete(0, builder.length());
+
+        System.out.println(builder.length());
 
     }
 }
