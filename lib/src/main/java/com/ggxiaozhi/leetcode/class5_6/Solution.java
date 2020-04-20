@@ -1,19 +1,13 @@
-package com.ggxiaozhi.leetcode.class5;
+package com.ggxiaozhi.leetcode.class5_6;
 
-import com.ggxiaozhi.review.class4.LinkedListQueue;
-
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Deque;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Queue;
 import java.util.Stack;
-import java.util.Vector;
 
 import javafx.util.Pair;
 
@@ -1613,15 +1607,187 @@ public class Solution {
             return root;
         }
 
-        if ((root.val > p.val && root.val < q.val)||(root.val < p.val && root.val > q.val)) {//4. 如果PQ 再root两侧 那么root就是最小公共节点 返回
+        if ((root.val > p.val && root.val < q.val) || (root.val < p.val && root.val > q.val)) {//4. 如果PQ 再root两侧 那么root就是最小公共节点 返回
             return root;
         }
 
         if (root.val > p.val && root.val > q.val) {//2. 都在左侧 难么继续调用
             return lowestCommonAncestor(root.left, p, q);//去左子树去找
-        }else {//root.val < p.val && root.val < q.val 3 都在右子树 那么去右子树去找。
+        } else {//root.val < p.val && root.val < q.val 3 都在右子树 那么去右子树去找。
             return lowestCommonAncestor(root.right, p, q);
         }
+    }
+
+    /**
+     * 17. 电话号码的字母组合
+     * TODO 视频中的讲解
+     * 给定一个仅包含数字 2-9 的字符串，返回所有它能表示的字母组合。
+     * <p>
+     * 给出数字到字母的映射如下（与电话按键相同）。注意 1 不对应任何字母。
+     * <p>
+     * 示例:
+     * <p>
+     * 输入："23"
+     * 输出：["ad", "ae", "af", "bd", "be", "bf", "cd", "ce", "cf"].
+     * <p>
+     * 说明:
+     * 尽管上面的答案是按字典序排列的，但是你可以任意选择答案输出的顺序。
+     * <p>
+     * 思路：
+     * 可以想成是一种类似数的结构 比如 23
+     * //             2
+     * //         a/ b| \c
+     * //        3    3   3
+     * //     d/e|\f
+     * //    ad ae af bd be bf cd ce cf
+     * //
+     * 1. 针对数字 去letterMap中找到对应的字符串
+     * 2. 取出字符串中的每个字符
+     * 3. 将每个字符拼接到已经拼接好的字符中
+     * 4. index+1看下一个字符
+     */
+    private static final String[] letterMap = {
+            "",
+            "",
+            "abc",
+            "def",
+            "ghi",
+            "jkl",
+            "mno",
+            "pqrs",
+            "tuv",
+            "wxyz"
+    };
+
+    List<String> res = new ArrayList<>();
+
+    public List<String> letterCombinations(String digits) {
+
+        if (digits.isEmpty())
+            return res;
+        findLetter(digits, 0, "");
+        return res;
+    }
+
+    /**
+     * 针对给定字符 我们要组合的所有路径
+     *
+     * @param digits 问题中的字符串
+     * @param index  我们要处理digits的下标对应的字符
+     * @param s      这条树中经过路径的之前已经拼接好的字符
+     */
+    private void findLetter(String digits, int index, String s) {
+        //递归终止条件 index已经达到digits长度 到这里说明一个路径已经走到头了 那么我们需要将结果加入到res中
+        if (digits.length() == index) {
+            res.add(s);
+            return;
+        }
+        //取出要遍历到了字符串的哪个元素
+        char c = digits.charAt(index);
+        //取出数字对应的字符串
+        String letter = letterMap[c - '0'];
+
+        for (int i = 0; i < letter.length(); i++) {
+            //取出每个字符串的字符 然后和已经拼接好的字符串s进行拼接 同时index要+1
+            findLetter(digits, index + 1, s + letter.charAt(i));
+        }
+    }
+
+
+    /**
+     * 450. 删除二叉搜索树中的节点
+     * <p>
+     * 给定一个二叉搜索树的根节点 root 和一个值 key，删除二叉搜索树中的 key 对应的节点，并保证二叉搜索树的性质不变。返回二叉搜索树（有可能被更新）的根节点的引用。
+     * <p>
+     * 一般来说，删除节点可分为两个步骤：
+     * <p>
+     * 首先找到需要删除的节点；
+     * 如果找到了，删除它。
+     * <p>
+     * 说明： 要求算法时间复杂度为 O(h)，h 为树的高度。
+     * <p>
+     * 示例:
+     * <p>
+     * root = [5,3,6,2,4,null,7]
+     * key = 3
+     * <p>
+     * 5
+     * / \
+     * 3   6
+     * / \   \
+     * 2   4   7
+     * <p>
+     * 给定需要删除的节点值是 3，所以我们首先找到 3 这个节点，然后删除它。
+     * <p>
+     * 一个正确的答案是 [5,4,6,2,null,null,7], 如下图所示。
+     * <p>
+     * 5
+     * / \
+     * 4   6
+     * /     \
+     * 2       7
+     * <p>
+     * 另一个正确答案是 [5,2,6,null,4,null,7]。
+     * <p>
+     * 5
+     * / \
+     * 2   6
+     * \   \
+     * 4   7
+     * <p>
+     * 这个方法返回删除后的根节点
+     */
+    public TreeNode deleteNode(TreeNode root, int key) {
+
+        if (root == null) {
+            return root;
+        }
+
+        if (root.val > key) {//key在左子树
+            root.left = deleteNode(root.left, key);
+            return root;
+        } else if (root.val < key) {//key在右子树
+            root.right = deleteNode(root.right, key);
+            return root;
+        } else {//相等
+            if (root.left == null) {
+                return root.right;
+            }
+            if (root.right == null) {
+                return root.left;
+            }
+
+            TreeNode min = min(root.right);
+            TreeNode successor = removeMin(root.right);
+
+            min.left = root.left;
+            min.right = successor;
+            root.left = root.right = null;
+            return min;
+        }
+    }
+
+
+    /**
+     * 找到一个根节点的最小值
+     */
+    private TreeNode min(TreeNode root) {
+        if (root == null || root.left == null)
+            return root;
+        return min(root.left);
+    }
+
+    /**
+     * 删除最小值 并返回删除最小值后的根节点
+     */
+    private TreeNode removeMin(TreeNode root) {
+
+        if (root == null || root.left == null) {//找到了最小值
+            return root.right;
+        }
+        //这一步删除了最小节点
+        root.left = removeMin(root.left);
+        return root;
     }
 
     public static void main(String[] args) {
