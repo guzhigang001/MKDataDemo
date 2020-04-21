@@ -1,4 +1,4 @@
-package com.ggxiaozhi.leetcode.class5_6;
+package com.ggxiaozhi.leetcode.class5_6_7;
 
 /**
  * Create by ggxz
@@ -92,6 +92,9 @@ public class Solution2 {
         }
         return builder.toString();
     }
+
+
+
 
     public static void main(String[] args) {
         List<List<String>> aab = partition("aab");
