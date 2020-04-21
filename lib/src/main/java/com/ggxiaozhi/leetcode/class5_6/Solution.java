@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.Stack;
+import java.util.Vector;
 
 import javafx.util.Pair;
 
@@ -1790,18 +1791,140 @@ public class Solution {
         return root;
     }
 
+    /**
+     * 230. 二叉搜索树中第K小的元素
+     * <p>
+     * 给定一个二叉搜索树，编写一个函数 kthSmallest 来查找其中第 k 个最小的元素。
+     * <p>
+     * 说明：
+     * 你可以假设 k 总是有效的，1 ≤ k ≤ 二叉搜索树元素个数。
+     * <p>
+     * 示例 1:
+     * <p>
+     * 输入: root = [3,1,4,null,2], k = 1
+     * 3
+     * / \
+     * 1   4
+     * \
+     * 2
+     * 输出: 1
+     * <p>
+     * 示例 2:
+     * <p>
+     * 输入: root = [5,3,6,2,4,null,null,1], k = 3
+     * 5
+     * / \
+     * 3   6
+     * / \
+     * 2   4
+     * /
+     * 1
+     * 输出: 3
+     * <p>
+     * 进阶：
+     * 如果二叉搜索树经常被修改（插入/删除操作）并且你需要频繁地查找第 k 小的值，你将如何优化 kthSmallest 函数？
+     * 思路 ：
+     * 中序遍历思想
+     * <p>
+     * //TODO 解法二 分治法也是一个很好的思路
+     * https://leetcode-cn.com/problems/kth-smallest-element-in-a-bst/solution/xiang-xi-tong-su-de-si-lu-fen-xi-duo-jie-fa-by--48/
+     */
+    public static int kthSmallest(TreeNode root, int k) {
+        if (root == null)
+            return 0;
+        List<Integer> list = new ArrayList<>();
+        findK(root, list);
+        return list.get(k - 1);
+    }
+
+    private static void findK(TreeNode root, List<Integer> vector) {
+
+        if (root == null)
+            return;
+
+        findK(root.left, vector);
+        vector.add(root.val);
+        System.out.println(root.val);
+        findK(root.right, vector);
+    }
+
+
+    /**
+     * 131. 分割回文串
+     * <p>
+     * 给定一个字符串 s，将 s 分割成一些子串，使每个子串都是回文串。
+     * <p>
+     * 返回 s 所有可能的分割方案。
+     * <p>
+     * 示例:
+     * <p>
+     * 输入: "aab"
+     * 输出:
+     * [
+     * ["aa","b"],
+     * ["a","a","b"]
+     * ]
+     * <p>
+     * https://leetcode-cn.com/problems/palindrome-partitioning/solution/xiang-xi-tong-su-de-si-lu-fen-xi-duo-jie-fa-by-3-7/
+     * <p>
+     * //TODO 黄色笔记本上 这个可以参考上面 思路在本子上 回溯法 不太好理解
+     */
+    public List<List<String>> partition(String s) {
+
+        int len = s.length();
+        List<List<String>> res = new ArrayList<>();
+        if (len == 0)
+            return res;
+
+        cutMatch(s, 0, len, res);
+
+        return res;
+
+    }
+
+    /**
+     * 思路就是依次切割判断 已经切割的是否是回文串
+     * 如果是 那么继续向下切割 如果不是 跳过
+     * 从start位置开始切割 如果左边的是回文串 那么继续向下切割
+     * 如果不是 跳过 继续下一个切割 知道 切割s的最后一个 也就是start==len
+     *
+     * @param s     要访问的字符串
+     * @param start 将要访问s中的开始下标
+     * @param len   s的长度 固定不变
+     * @param res   最后返回的结果
+     */
+    private void cutMatch(String s, int start, int len, List<List<String>> res) {
+
+        //如果已经切割到最后一个字符串了 这里是如果到这里就说明找到了一条答案
+        //如果不是当我们遍历的时候 如果不符合回文串的定义 我们直接越过
+        if (start == len) {
+
+
+            List<String> list = new ArrayList<>();
+            list.add(s);
+            return;
+        }
+
+        for (int i = 0; i < len; i++) {
+
+        }
+
+    }
+
+    public boolean isPalindrome() {
+
+        return false;
+    }
+
     public static void main(String[] args) {
 
 //        boolean b = isPalindrome(new ListNode(1, new ListNode(1, new ListNode(2, new ListNode(1, null)))));
 //        System.out.println(b);
-//        isSymmetric3(new TreeNode(1, new TreeNode(2, new TreeNode(3), new TreeNode(4)), new TreeNode(2, new TreeNode(4), new TreeNode(3))));
+//        kthSmallest(new TreeNode(5, new TreeNode(2, new TreeNode(1), new TreeNode(3)), new TreeNode(7, new TreeNode(6), new TreeNode(8))), 3);
 
-        StringBuilder builder = new StringBuilder();
-        builder.append("aa").append("bb");
-        System.out.println(builder.length());
-        builder.delete(0, builder.length());
+        String s = "aab";
+        System.out.println(s.substring(0, 3));
 
-        System.out.println(builder.length());
 
     }
 }
