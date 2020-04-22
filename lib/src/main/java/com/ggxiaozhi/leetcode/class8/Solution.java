@@ -108,7 +108,7 @@ public class Solution {
         List<List<Integer>> res = new ArrayList<>();
 
         List<Integer> temp = new ArrayList<>();
-        DFS(arr, 0, n, k, res, temp);
+        DFS(arr, 1, n, k, res, temp);
 
         return res;
     }
@@ -121,11 +121,42 @@ public class Solution {
             return;
         }
 
-        for (int i = start; i < n; i++) {
+        //一个典型的 DFS回溯算法优化 根据这个逻辑 当我们的n-start
+        for (int i = start; i <= n; i++) {
 
-            int p = arr[i];
+            int p = arr[i - 1];
             temp.add(p);
             DFS(arr, i + 1, n, k, res, temp);
+            temp.remove(temp.size() - 1);
+        }
+    }
+    public static List<List<Integer>> combine2(int n, int k) {
+        if (n == 0)
+            return new ArrayList<>();
+        List<List<Integer>> res = new ArrayList<>();
+
+        List<Integer> temp = new ArrayList<>();
+        DFS2( 1, n, k, res, temp);
+
+        return res;
+    }
+    //num代替数组arr
+    private static void DFS2( int start, int n, int k, List<List<Integer>> res, List<Integer> temp ){
+
+        if (temp.size() == k) {
+            List<Integer> list = new ArrayList<>(temp);
+            res.add(list);
+            return;
+        }
+
+        //一个典型的 DFS回溯算法优化
+        // TODO 这个问题还是不好理解 要多练习看看别人是怎么用的  这个就是剪枝
+        // 还有k - c.size()个空位, 所以, [i...n] 中至少要有 k - c.size() 个元素
+        // i最多为 n - (k - c.size()) + 1
+        for (int i = start; i <= n-(k-temp.size())+1; i++) {
+
+            temp.add(i);
+            DFS2( i + 1, n, k, res, temp);
             temp.remove(temp.size() - 1);
         }
     }
@@ -140,5 +171,13 @@ public class Solution {
 //        System.out.println(Arrays.toString(Arrays.copyOfRange(arr, arr.length, arr.length)));
 
         System.out.println(combine(4, 2));
+
+        int[][] arr = {
+                {'A', 'B', 'C', 'E'},
+                {'S', 'F', 'C', 'S'},
+                {'A', 'D', 'E', 'E'}
+        };
+        System.out.println(arr.length);
+        System.out.println(arr[0].length);
     }
 }
