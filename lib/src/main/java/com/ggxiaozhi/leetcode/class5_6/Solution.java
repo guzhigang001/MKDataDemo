@@ -23,7 +23,7 @@ import javafx.util.Pair;
  * //TODO 437递归题解 解释递归的含义：
  * 递归的一个重要思想就是两部分：1.找到最简单的子问题求解，2.其他问题不考虑内在细节，只考虑整体逻辑
  */
-@SuppressWarnings("ConstantConditions")
+@SuppressWarnings({"ConstantConditions", "ResultOfMethodCallIgnored"})
 public class Solution {
     public static class ListNode {
         int val;
@@ -1660,9 +1660,9 @@ public class Solution {
             "wxyz"
     };
 
-    List<String> res = new ArrayList<>();
+    static List<String> res = new ArrayList<>();
 
-    public List<String> letterCombinations(String digits) {
+    public static List<String> letterCombinations(String digits) {
 
         if (digits.isEmpty())
             return res;
@@ -1677,7 +1677,7 @@ public class Solution {
      * @param index  我们要处理digits的下标对应的字符
      * @param s      这条树中经过路径的之前已经拼接好的字符
      */
-    private void findLetter(String digits, int index, String s) {
+    private static void findLetter(String digits, int index, String s) {
         //递归终止条件 index已经达到digits长度 到这里说明一个路径已经走到头了 那么我们需要将结果加入到res中
         if (digits.length() == index) {
             res.add(s);
@@ -1690,7 +1690,9 @@ public class Solution {
 
         for (int i = 0; i < letter.length(); i++) {
             //取出每个字符串的字符 然后和已经拼接好的字符串s进行拼接 同时index要+1
-            findLetter(digits, index + 1, s + letter.charAt(i));
+            String nextS = s + letter.charAt(i);
+            findLetter(digits, index + 1, nextS);
+            nextS.substring(0, nextS.length() - 1);
         }
     }
 
@@ -1869,14 +1871,15 @@ public class Solution {
      * <p>
      * //TODO 黄色笔记本上 这个可以参考上面 思路在本子上 回溯法 不太好理解
      */
-    public List<List<String>> partition(String s) {
+    public static List<List<String>> partition(String s) {
 
         int len = s.length();
         List<List<String>> res = new ArrayList<>();
         if (len == 0)
             return res;
 
-        cutMatch(s, 0, len, res);
+        List<String> temp = new ArrayList<>();
+        cutMatch(s, 0, len, res, temp);
 
         return res;
 
@@ -1893,27 +1896,54 @@ public class Solution {
      * @param len   s的长度 固定不变
      * @param res   最后返回的结果
      */
-    private void cutMatch(String s, int start, int len, List<List<String>> res) {
+    private static void cutMatch(String s, int start, int len,
+                                 List<List<String>> res, List<String> temp) {
 
         //如果已经切割到最后一个字符串了 这里是如果到这里就说明找到了一条答案
         //如果不是当我们遍历的时候 如果不符合回文串的定义 我们直接越过
         if (start == len) {
-
-
-            List<String> list = new ArrayList<>();
-            list.add(s);
+            //这里要新创建一个 以为res存的是temp的引用 那么最后 temp是会回溯删除的
+            //那么也就是 最后res会为null 所以我们要创建一个新的List
+            //TODO 这也就解释了 为什么我们再list中添加了一个元素 后又要删除 如果不删除我们的list只创建了一个
+            // 那么这个list会存入错乱 最后的结果会特别长
+            List<String> list = new ArrayList<>(temp);
+            res.add(list);
             return;
         }
 
-        for (int i = 0; i < len; i++) {
 
+        //从start开始向下树形的下面寻找 相当于越过 start之前的位置
+        for (int i = start; i < len; i++) {
+
+            //依次切割aab:  a->a,ab->aa,b->aab
+            //substring[start,end)
+            String p = s.substring(start, i + 1);
+            //左边的不是回文串 右边也就不用判断了
+            if (!isPalindrome(p)) {
+                continue;
+            }
+            //如果是回文串
+            //1.先添加入 temp集合中
+            temp.add(p);
+            cutMatch(s, i + 1, len, res, temp);
+            //删除上边添加的 回溯还原 temp和他的同级相同在向下面寻找
+            temp.remove(temp.size() - 1);
         }
 
     }
 
-    public boolean isPalindrome() {
+    public static boolean isPalindrome(String p) {
+        int start = 0;
+        int len = p.length() - 1;
+        while (start < len) {
+            if (p.charAt(start) != p.charAt(len)) {
+                return false;
+            }
+            start++;
+            len--;
+        }
 
-        return false;
+        return true;
     }
 
     public static void main(String[] args) {
@@ -1922,8 +1952,7 @@ public class Solution {
 //        System.out.println(b);
 //        kthSmallest(new TreeNode(5, new TreeNode(2, new TreeNode(1), new TreeNode(3)), new TreeNode(7, new TreeNode(6), new TreeNode(8))), 3);
 
-        String s = "aab";
-        System.out.println(s.substring(0, 3));
+        System.out.println(partition("acca"));
 
 
     }
