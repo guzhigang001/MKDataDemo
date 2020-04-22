@@ -1,15 +1,16 @@
 package com.ggxiaozhi.leetcode.class5_6_7;
 
-/**
- * Create by ggxz
- * 2020/4/21
- * description:
- */
-
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
+
+/**
+ * Create by ggxz
+ * 2020/4/21
+ * description: 131
+ * 回溯算法
+ */
 
 public class Solution2 {
 
@@ -97,7 +98,7 @@ public class Solution2 {
 
 
     public static void main(String[] args) {
-        List<List<String>> aab = partition("aab");
+        List<List<String>> aab = partition("acca");
         System.out.println(aab);
     }
 }
