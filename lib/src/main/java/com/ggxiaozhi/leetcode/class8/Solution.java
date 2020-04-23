@@ -481,69 +481,9 @@ public class Solution {
      * 主要还是利用回溯思想
      * 这里不同得是 当我们遍历的回溯回去的时候  我们是不需要还原数据的
      * 因为我们寻找陆地 陆地本身存在 我们找到后直接回溯就好了同下次再找的时候我们就不用看它了
+     * @see Solution2
      */
 
-
-    public int numIslands(char[][] grid) {
-
-        if (grid.length == 0)
-            return 0;
-        if (grid[0].length == 0)
-            return 0;
-        int res = 0;
-
-        int m = grid.length;
-        int n = grid[0].length;
-
-        boolean[][] visit = new boolean[m][n];
-
-
-        for (int i = 0; i < m; i++) {
-            for (int j = 0; j < n; j++) {
-                //是陆地 同时没有访问过
-                //起始位置遍历 遍历到一个陆地后 通过findLands方法 将传入的以i，j为起始整个陆地
-                //并且标记 下次已经被visit标记的陆地不再访问 知道找到新的陆地res++
-                if (grid[i][j] == '1' && !visit[i][j]) {
-                    res++;
-                    //TODO 其实也是DFS
-                    findLands(grid, i, j, visit);
-                }
-            }
-        }
-        return res;
-    }
-
-    /**
-     * //TODO 这里的DFS 有2个特点：
-     *        1. 没有递归终止条件         这样会一直递归到底 但是我们循环的if语句中有判断条件 ，这就相当于剪枝 其实也可以看成递归条件 融合进判断条件中
-     *        2. 回溯时我们没有重置数据    这是因为 这道题和79有些不一样 79是找一个路径 找到后保存避免同级搜索 状态不一致，但是这个题是区域，不是单独的一个路径
-     *           也就是说我们
-     */
-    // 从grid[x][y]的位置开始,进行floodfill
-    // 保证(x,y)合法,且grid[x][y]是没有被访问过的陆地
-    private void findLands(char[][] grid, int x, int y, boolean[][] visit) {
-        //首先确定了grid[x][y]是陆地且我们现在访问他 那么 设置标识
-        visit[x][y] = true;
-        //以grid[x][y]为中心向四个方向查看是否有陆地
-        for (int i = 0; i < 4; i++) {
-            //其中一个方向的坐标
-            int newX = x + d[i][0];
-            int newY = x + d[i][1];
-
-            //按照顺序满足三个条件
-            //1 首先newX newY是合法的
-            //2 没有访问过
-            //3 必须是陆地
-            //那么我们找到了一个符合要求的陆地
-            if (isLegal(newX, newY) && !visit[newX][newY] && grid[newX][newY] == '1') {
-                findLands(grid, newX, newY, visit);
-            }
-        }
-    }
-
-    public boolean isLegal(int x, int y, int m, int n) {
-        return x >= 0 && x < m && y >= 0 && y < n;
-    }
 
     /**
      * 51. N皇后
