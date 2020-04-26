@@ -2,6 +2,7 @@ package com.ggxiaozhi.leetcode.class9;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
 
@@ -211,31 +212,91 @@ public class Solution {
         }
     }
 
-    public static void main(String[] args) {
-        PriorityQueue<Integer> p = new PriorityQueue<>();
-        p.add(5);
-        p.add(2);
-        p.add(10);
-        p.add(1);
-        p.add(3);
-        System.out.println(p.peek());
 
-        int[][] arr = {
-                {2},
-                {3, 4},
-                {6, 5, 7},
-                {4, 1, 8, 3}
-        };
+    /**
+     * 343. 整数拆分
+     * <p>
+     * 给定一个正整数 n，将其拆分为至少两个正整数的和，并使这些整数的乘积最大化。 返回你可以获得的最大乘积。
+     * <p>
+     * 示例 1:
+     * <p>
+     * 输入: 2
+     * 输出: 1
+     * 解释: 2 = 1 + 1, 1 × 1 = 1。
+     * <p>
+     * 示例 2:
+     * <p>
+     * 输入: 10
+     * 输出: 36
+     * 解释: 10 = 3 + 3 + 4, 3 × 3 × 4 = 36。
+     * <p>
+     * 说明: 你可以假设 n 不小于 2 且不大于 58。
+     */
+    static int[] findArr;
 
-        List<List<Integer>> lists = new ArrayList<>();
-        for (int i = 0; i < arr.length; i++) {
-            int[] ints = arr[i];
-            List<Integer> list = new ArrayList<>();
-            for (int i1 = 0; i1 < ints.length; i1++) {
-                list.add(ints[i1]);
-                lists.add(list);
-            }
+    public static int integerBreak(int n) {
+
+        if (n == 2) {
+            return 1;
         }
-        System.out.println(minimumTotal(lists));
+        findArr = new int[n + 1];
+        Arrays.fill(findArr, -1);
+        return findInteger(n);
+    }
+
+    /**
+     * 将n进行分割(至少分割成两部分) 可以获得他们的最大乘机
+     *
+     * @param n 每次n得规模
+     */
+
+    private static int findInteger(int n) {
+        if (n == 1) {//当n==1时 不能再分割了
+//            temp.add(1);  //乘法 不加最后的1也没问题
+            return 1;
+        }
+
+        if (findArr[n] != -1) {
+            return findArr[n];
+        }
+        //res 不能放在方法外面
+        int res = 0;
+        for (int i = 1; i < n; i++) {
+            int max = Math.max(i * (n - i), i * findInteger(n - i));
+            res = Math.max(res, max);
+        }
+        findArr[n] = res;
+        return res;
+    }
+
+
+    public static void main(String[] args) {
+//        PriorityQueue<Integer> p = new PriorityQueue<>();
+//        p.add(5);
+//        p.add(2);
+//        p.add(10);
+//        p.add(1);
+//        p.add(3);
+//        System.out.println(p.peek());
+//
+//        int[][] arr = {
+//                {2},
+//                {3, 4},
+//                {6, 5, 7},
+//                {4, 1, 8, 3}
+//        };
+//
+//        List<List<Integer>> lists = new ArrayList<>();
+//        for (int i = 0; i < arr.length; i++) {
+//            int[] ints = arr[i];
+//            List<Integer> list = new ArrayList<>();
+//            for (int i1 = 0; i1 < ints.length; i1++) {
+//                list.add(ints[i1]);
+//                lists.add(list);
+//            }
+//        }
+//        System.out.println(minimumTotal(lists));
+
+        System.out.println(integerBreak(10));
     }
 }
