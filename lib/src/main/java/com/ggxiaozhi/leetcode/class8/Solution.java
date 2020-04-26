@@ -623,6 +623,6 @@ public class Solution {
                 {'S', 'F', 'C', 'S'},
                 {'A', 'D', 'E', 'E'}
         };
-        System.out.println(exist(arr, ""));
+        System.out.println(arr[0].length);
     }
 }

@@ -269,6 +269,141 @@ public class Solution {
         return res;
     }
 
+    /**
+     * 动态规划
+     *
+     * @param n
+     * @return
+     */
+    public int integerBreak2(int n) {
+
+        if (n < 1)
+            throw new IllegalArgumentException("n should be greater than zero");
+
+        int[] memo = new int[n + 1];
+        memo[1] = 1;
+        for (int i = 2; i <= n; i++)
+            // 求解memo[i] n进行分割(至少分割成两部分) 可以获得他们的最大乘机
+            for (int j = 1; j <= i - 1; j++)
+                memo[i] = max3(memo[i], j * (i - j), j * memo[i - j]);
+
+        return memo[n];
+    }
+
+    private int max3(int a, int b, int c) {
+        return Math.max(a, Math.max(b, c));
+    }
+
+    /**
+     * 62. 不同路径
+     * <p>
+     * 一个机器人位于一个 m x n 网格的左上角 （起始点在下图中标记为“Start” ）。
+     * <p>
+     * 机器人每次只能向下或者向右移动一步。机器人试图达到网格的右下角（在下图中标记为“Finish”）。
+     * <p>
+     * 问总共有多少条不同的路径？
+     * <p>
+     * 例如，上图是一个7 x 3 的网格。有多少可能的路径？
+     * <p>
+     * <p>
+     * <p>
+     * 示例 1:
+     * <p>
+     * 输入: m = 3, n = 2
+     * 输出: 3
+     * 解释:
+     * 从左上角开始，总共有 3 条路径可以到达右下角。
+     * 1. 向右 -> 向右 -> 向下
+     * 2. 向右 -> 向下 -> 向右
+     * 3. 向下 -> 向右 -> 向右
+     * <p>
+     * 示例 2:
+     * <p>
+     * 输入: m = 7, n = 3
+     * 输出: 28
+     * <p>
+     * 思路：
+     * 创建一个二维的数组
+     *
+     * @param m
+     * @param n
+     * @return
+     */
+    //路径上的点[x][y]
+    static int[][] upiqueArr;
+    //[x][y]这个点对应有多少条路径
+
+    static int m, n;
+
+    //记忆化搜索
+    public static int uniquePaths(int m, int n) {
+
+        if (m == 1)
+            return 1;
+        Solution.m = m;
+        Solution.n = n;
+        upiqueArr = new int[n][m];
+
+        int num = 0;
+        for (int i = 0; i < upiqueArr.length; i++) {
+            for (int j = 0; j < upiqueArr[i].length; j++) {
+                upiqueArr[i][j] = num++;
+            }
+        }
+        int[] arr = new int[m * n];
+        Arrays.fill(arr, -1);
+
+
+        return findPaths(0, 0, arr);
+    }
+
+    /**
+     * 以[1][1]点出发 到 [m][n] 共有多少条路径
+     */
+    private static int findPaths(int x, int y, int[] arr) {
+        if (x == n - 1 || y == m - 1) {
+            return 1;
+        }
+
+        if (arr[upiqueArr[x][y]] != -1) {
+            return arr[upiqueArr[x][y]];
+        }
+
+        //总路径=向左走一步的总路径+向右走一步的总路径
+        int res = findPaths(x + 1, y, arr) + findPaths(x, y + 1, arr);
+        arr[upiqueArr[x][y]] = res;
+        return res;
+    }
+
+    /**
+     * 动态规划
+     *
+     * @param m
+     * @param n
+     * @return
+     */
+    public static int uniquePaths2(int m, int n) {
+        if (m == 1)
+            return 1;
+        upiqueArr = new int[n][m];
+
+
+        for (int i = 0; i < n; i++) {
+            upiqueArr[i][m - 1] = 1;
+        }
+        for (int i = 0; i < m; i++) {
+            upiqueArr[n - 1][i] = 1;
+        }
+
+
+        for (int i = n - 1; i > 0; i--) {
+            for (int j = m - 1; j > 0; j--) {
+
+                upiqueArr[i][j] = upiqueArr[i - 1][j] + upiqueArr[i][j - 1];
+            }
+        }
+        return upiqueArr[0][0];
+    }
 
     public static void main(String[] args) {
 //        PriorityQueue<Integer> p = new PriorityQueue<>();
@@ -297,6 +432,6 @@ public class Solution {
 //        }
 //        System.out.println(minimumTotal(lists));
 
-        System.out.println(integerBreak(10));
+        System.out.println(uniquePaths2(7, 3));
     }
 }
