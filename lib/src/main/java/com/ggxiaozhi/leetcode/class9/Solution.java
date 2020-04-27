@@ -526,7 +526,7 @@ public class Solution {
         //一致到i=0 那么memoRob[0]就是我们要求的解
         //TODO memoRob[i] 从i到n-1找到最到的值 这里我们可能不是从i开始 但是memoRob[i]存的是 [i...n-1]中最大的值
         //     这个过程就是 从思路所说求[i...n-1]中最大的值 每次不能取相邻的两个值
-        for (int i = len - 2; i < len; i--) {
+        for (int i = len - 2; i >=0; i--) {
 
             //j从i开始 也就是不相邻的要求的体现
             for (int j = i; j < len; j++) {
