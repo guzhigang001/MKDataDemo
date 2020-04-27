@@ -521,12 +521,12 @@ public class Solution {
         //1 创建结果数组
         memoRob = new int[len];
         //2 确定最小子问题 根据子问题求解
-        memoRob[n - 1] = nums[len - 1];
+        memoRob[len - 1] = nums[len - 1];
         //这个循环表示 我们已经找到了n-1的子问题解  我们根据这个解 从右向左 一次递归
         //一致到i=0 那么memoRob[0]就是我们要求的解
         //TODO memoRob[i] 从i到n-1找到最到的值 这里我们可能不是从i开始 但是memoRob[i]存的是 [i...n-1]中最大的值
         //     这个过程就是 从思路所说求[i...n-1]中最大的值 每次不能取相邻的两个值
-        for (int i = len - 2; i < len; i++) {
+        for (int i = len - 2; i < len; i--) {
 
             //j从i开始 也就是不相邻的要求的体现
             for (int j = i; j < len; j++) {
@@ -535,7 +535,7 @@ public class Solution {
                 //这个值的 memoRob[i]可能求过 也可能没求过 这里的作用是优化重复子问题
                 // nums[j] +  memoRob[j + 2]表示  nums[j]这个值开始加上下个值得最大和 也就是 memoRob[j + 2]来得到
                 // memoRob[i]
-                memoRob[i] = Math.max(memoRob[i], nums[j] + (j + 2 < n ? memoRob[j + 2] : 0));
+                memoRob[i] = Math.max(memoRob[i], nums[j] + (j + 2 < len ? memoRob[j + 2] : 0));
             }
         }
         //最后 memoRob[0]的 位置 存的就是最终的解
