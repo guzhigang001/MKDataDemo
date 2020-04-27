@@ -526,7 +526,7 @@ public class Solution {
         //一致到i=0 那么memoRob[0]就是我们要求的解
         //TODO memoRob[i] 从i到n-1找到最到的值 这里我们可能不是从i开始 但是memoRob[i]存的是 [i...n-1]中最大的值
         //     这个过程就是 从思路所说求[i...n-1]中最大的值 每次不能取相邻的两个值
-        for (int i = len - 2; i >=0; i--) {
+        for (int i = len - 2; i >= 0; i--) {
 
             //j从i开始 也就是不相邻的要求的体现
             for (int j = i; j < len; j++) {
@@ -542,6 +542,69 @@ public class Solution {
         return memoRob[0];
     }
 
+    /**
+     * 有一个背包，它的容量为C (Capacity)，。 现在有n种不同的物品，编号为0...n-1，其中每一件物品的重量为w(i)，价值为v(i)。
+     * 问可以向这个背包中盛放哪些物品，使得在不超过背包容量的基础上，物品的总价值最大。
+     * <p>
+     * <p>
+     * 思路：
+     * F(n, C)考虑将n个物品放进容量为C的背包，使得价值最大
+     * <p>
+     * 我们假设从0...n-1中 不停的通过函数F(i,c)求得价值最大 i表示背包里的物品个数  c表示背包 剩余容量
+     * 那么当一个新物品 也就是i++的时候 我们有两个选择：
+     * 1. 不放新的元素 也就是原函数不变 由于i++了 所以原函数为① F(i-1 ,c)
+     * 2. 放新元素② 那么现在背包的价值等于=新加物品的价值v(i)+ 原来物品的价值F(i-1 ,C-W(i) )   C-W(i)表示新加了元素 那么背包的容量现在等于=原来的重量C=C-新的物品的重量w(i)
+     * <p>
+     * F(i,c) = F(i-1 ,c)  ①
+     * = v(i)+F(i-1 ,C-W(i) )  ②
+     * <p>
+     * 3. 最后我们通过上面的分析 我们知道我们是否添加进背包的取决于这两个选择错产生的价值那个更大 所以通过max函数对比选择
+     * F(i,c) = max(F(i-1 ,C),v() +F(i-1 ,C- w(i) )
+     */
+
+    /**
+     * @param w 表示有w个物品 数组中从0...w.length-1 每个元素为这个物品的重量
+     * @param v v与w是对应的长度必须一直 否则无意义 v中0...v.length-1对应0...w.length-1中物品的价值
+     * @param C 背包的容量 是指能承受w中多少个物品对应的重量
+     * @return C容量能装下的最大价值
+     */
+    public static int knapsack01(int[] w, int[] v, int C) {
+        int lenW = w.length, lenV = v.length;
+
+        if (lenV == 0 || lenV != lenW)
+            return 0;
+
+        if (C == 0)
+            return 0;
+
+        return bestValue(w, v, lenW - 1, C);
+    }
+
+    /**
+     * 用 [index...len]的物品,填充容积为c的背包的最大价值 注意index不一定一定会遍历到0
+     * 因为可能我们添加的第一元素重量正好填满我们容量C 那么
+     *
+     * @param w
+     * @param v
+     * @param index 初始值为len-1 表示 从后往前 是否放入最后一个物品 使得此方法返回的值 为最大的价值
+     * @param c
+     * @return 返回c容量下 放入
+     */
+    private static int bestValue(int[] w, int[] v, int index, int c) {
+        //当容量满的时候 递归终止
+        //index表示下标我们传入的是len-1 保证合法性 此时如果index<0 那么直接返回
+        if (c <= 0 || index < 0) {
+            return 0;
+        }
+
+        //index元素不添加直接添加下一个元素 一直这样一直遍历 知道遍历到index=0
+        int res = bestValue(w, v, index - 1, c);
+        if (c >= w[index]) {//添加index元素 然后继续和下一个元素比较去最大值
+            // v[index]添加入背包  bestValue(w, v, index - 1, c - w[index])看下一个元素 他们的总和  在与res比较
+            res = Math.max(res, v[index] + bestValue(w, v, index - 1, c - w[index]));
+        }
+        return res;
+    }
 
     public static void main(String[] args) {
 //        PriorityQueue<Integer> p = new PriorityQueue<>();
@@ -570,7 +633,10 @@ public class Solution {
 //        }
 //        System.out.println(minimumTotal(lists));
 
-        int[] nums = {2, 7, 9, 3, 1};
-        System.out.println(rob2(nums));
+//        int[] nums = {2, 7, 9, 3, 1};
+//        System.out.println(rob2(nums));
+        int[] w = {1, 2, 3};
+        int[] v = {6, 10, 12};
+        System.out.println(knapsack01(w, v, 3));
     }
 }
