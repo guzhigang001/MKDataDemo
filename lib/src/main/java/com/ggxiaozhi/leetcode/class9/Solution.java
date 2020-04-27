@@ -252,7 +252,7 @@ public class Solution {
 
     private static int findInteger(int n) {
         if (n == 1) {//当n==1时 不能再分割了
-//            temp.add(1);  //乘法 不加最后的1也没问题
+            //乘法 不加最后的1也没问题
             return 1;
         }
 
@@ -358,9 +358,10 @@ public class Solution {
     }
 
     /**
-     * 以[1][1]点出发 到 [m][n] 共有多少条路径
+     * 以[10][0]点出发 到 [m-1][n-1] 共有多少条路径
      */
     private static int findPaths(int x, int y, int[] arr) {
+        //已经到了边界 边界到达终点为1
         if (x == n - 1 || y == m - 1) {
             return 1;
         }
@@ -389,21 +390,158 @@ public class Solution {
 
 
         for (int i = 0; i < n; i++) {
-            upiqueArr[i][m - 1] = 1;
+            upiqueArr[i][0] = 1;
         }
         for (int i = 0; i < m; i++) {
-            upiqueArr[n - 1][i] = 1;
+            upiqueArr[0][i] = 1;
         }
 
 
-        for (int i = n - 1; i > 0; i--) {
-            for (int j = m - 1; j > 0; j--) {
+        for (int i = 1; i < upiqueArr.length; i++) {
+            for (int j = 1; j < upiqueArr[i].length; j++) {
 
                 upiqueArr[i][j] = upiqueArr[i - 1][j] + upiqueArr[i][j - 1];
             }
         }
-        return upiqueArr[0][0];
+        return upiqueArr[n - 1][m - 1];
     }
+
+    /**
+     * //TODO 状态定义和状态转移
+     * <p>
+     * 198. 打家劫舍
+     * <p>
+     * 你是一个专业的小偷，计划偷窃沿街的房屋。每间房内都藏有一定的现金，影响你偷窃的唯一制约因素就是相邻的房屋装有相互连通的防盗系统，如果两间相邻的房屋在同一晚上被小偷闯入，系统会自动报警。
+     * <p>
+     * 给定一个代表每个房屋存放金额的非负整数数组，计算你在不触动警报装置的情况下，能够偷窃到的最高金额。
+     * <p>
+     * 示例 1:
+     * <p>
+     * 输入: [1,2,3,1]
+     * 输出: 4
+     * 解释: 偷窃 1 号房屋 (金额 = 1) ，然后偷窃 3 号房屋 (金额 = 3)。
+     * 偷窃到的最高金额 = 1 + 3 = 4 。
+     * <p>
+     * 示例 2:
+     * <p>
+     * 输入: [2,7,9,3,1]
+     * 输出: 12
+     * 解释: 偷窃 1 号房屋 (金额 = 2), 偷窃 3 号房屋 (金额 = 9)，接着偷窃 5 号房屋 (金额 = 1)。
+     * 偷窃到的最高金额 = 2 + 9 + 1 = 12 。
+     */
+    static int[] robArr;
+
+    public static int rob(int[] nums) {
+        if (nums.length == 1) {
+            return nums[0];
+        }
+        if (nums.length == 2) {
+            return Math.max(nums[0], nums[1]);
+        }
+
+        robArr = new int[nums.length];
+        Arrays.fill(robArr, -1);
+        return findRob(0, nums, nums.length);
+    }
+
+    /**
+     * 找到以index为起始点 返回nums中最大的和
+     *
+     * @param index
+     * @param nums
+     * @param len
+     * @return
+     */
+    private static int findRob(int index, int[] nums, int len) {
+        if (index == len - 1) {
+            return nums[index];
+        }
+
+        int res = 0;
+
+        for (int i = index; i < len; i++) {
+            res = Math.max(res, nums[i] + findRob(i + 2, nums, len));
+        }
+        return res;
+    }
+
+    /**
+     * 记忆化搜索
+     *
+     * @param index
+     * @param nums
+     * @param len
+     * @return
+     */
+
+    private static int findRob2(int index, int[] nums, int len) {
+        if (index == len - 1) {
+            return nums[index];
+        }
+
+        if (index >= len) {
+            return 0;
+        }
+
+        if (robArr[index] != -1) {
+            return robArr[index];
+        }
+        int res = 0;
+        for (int i = index; i < len; i++) {
+            res = Math.max(res, nums[i] + findRob2(i + 2, nums, len));
+        }
+        robArr[index] = res;
+        return res;
+    }
+
+    /**
+     * 动态规划
+     * <p>
+     * TODO  利用状态转移
+     * 状态转移就是将问题转化成方程的形式，然后我们根据方程写出我们的程序、
+     * 在动态规划中我们要先确定最小问题是什么  然后通过最小子问题一点一点求
+     * 除最终的问题
+     * 本题的思路是求[i...n-1]中最大的值 每次不能取相邻的两个值
+     * 那么本体的状态转移方程：f(x)表示我们函数 v(x)表示数组中的值
+     * f(0)=max{v(0)+f(2),v(1)+f(3),v(2)+f(4)...,v(n-3)+f(n-1),v(n-2),v(n-1)}
+     * 其中v(n-2),v(n-1)表示最后两个数字 我们去完后无法再取到后面的值
+     */
+
+    static int[] memoRob;
+
+    //思路是求[i...n-1]中最大的值 每次不能取相邻的两个值
+    public static int rob2(int[] nums) {
+
+        int len = nums.length;
+        if (len == 0)
+            return 0;
+        if (len == 1)
+            return nums[0];
+
+        //1 创建结果数组
+        memoRob = new int[len];
+        //2 确定最小子问题 根据子问题求解
+        memoRob[n - 1] = nums[len - 1];
+        //这个循环表示 我们已经找到了n-1的子问题解  我们根据这个解 从右向左 一次递归
+        //一致到i=0 那么memoRob[0]就是我们要求的解
+        //TODO memoRob[i] 从i到n-1找到最到的值 这里我们可能不是从i开始 但是memoRob[i]存的是 [i...n-1]中最大的值
+        //     这个过程就是 从思路所说求[i...n-1]中最大的值 每次不能取相邻的两个值
+        for (int i = len - 2; i < len; i++) {
+
+            //j从i开始 也就是不相邻的要求的体现
+            for (int j = i; j < len; j++) {
+
+                // memoRob[i]是表示从i开始 通过j的循环找到i以后最大的和的值
+                //这个值的 memoRob[i]可能求过 也可能没求过 这里的作用是优化重复子问题
+                // nums[j] +  memoRob[j + 2]表示  nums[j]这个值开始加上下个值得最大和 也就是 memoRob[j + 2]来得到
+                // memoRob[i]
+                memoRob[i] = Math.max(memoRob[i], nums[j] + (j + 2 < n ? memoRob[j + 2] : 0));
+            }
+        }
+        //最后 memoRob[0]的 位置 存的就是最终的解
+        return memoRob[0];
+    }
+
 
     public static void main(String[] args) {
 //        PriorityQueue<Integer> p = new PriorityQueue<>();
@@ -432,6 +570,7 @@ public class Solution {
 //        }
 //        System.out.println(minimumTotal(lists));
 
-        System.out.println(uniquePaths2(7, 3));
+        int[] nums = {2, 7, 9, 3, 1};
+        System.out.println(rob2(nums));
     }
 }
