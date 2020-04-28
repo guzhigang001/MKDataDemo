@@ -21,6 +21,8 @@ import java.util.PriorityQueue;
  * 将原问题拆解成若干子问题 同时保存子问题的答案 使得每个子问题只求解一次 最终获得原问题的答案
  * 因为存在重叠子问题
  * 动态规划往往子递归问题------------------> 记忆化搜索(自顶向下的解决问题)/动态规划(自顶向上的解决问题)
+ * <p>
+ * TODO 相关动态规划背包问题 322 377 474 139 494  回头要再看看第九章
  */
 @SuppressWarnings("ConstantConditions")
 public class Solution {
@@ -758,7 +760,7 @@ public class Solution {
     }
 
     /**
-     * 0-1背包问题继续空间优化
+     * 0-1背包问题继续空间优化 使用
      * 这次我们在knapsack01DP_OP
      */
     public static int knapsack01DP_OP2(int[] w, int[] v, int C) {
@@ -795,6 +797,110 @@ public class Solution {
 
         return dpmemo[(len - 1) % 2][C];
     }
+
+
+    /**
+     * 416. 分割等和子集
+     * <p>
+     * 给定一个只包含正整数的非空数组。是否可以将这个数组分割成两个子集，使得两个子集的元素和相等。
+     * <p>
+     * 注意:
+     * <p>
+     * 每个数组中的元素不会超过 100
+     * 数组的大小不会超过 200
+     * <p>
+     * 示例 1:
+     * <p>
+     * 输入: [1, 5, 11, 5]
+     * <p>
+     * 输出: true
+     * <p>
+     * 解释: 数组可以分割成 [1, 5, 5] 和 [11].
+     * <p>
+     * <p>
+     * <p>
+     * 示例 2:
+     * <p>
+     * 输入: [1, 2, 3, 5]
+     * <p>
+     * 输出: false
+     * <p>
+     * 解释: 数组不能分割成两个元素和相等的子集.
+     * <p>
+     * 思路：
+     * 这是一个典型背包问题，n个数 放进sum/2的背包中
+     * <p>
+     * f(n,C)=f(n-1,C)||f(n-1,c-w[n])  不选择这个元素 填满了C 或是选择这个元素 填满了C-w[n] 然后继续递归
+     * <p>
+     * 时间复杂度： O(n*sum/2)=O(n*sum)
+     * <p>
+     * 根据数据规模 200*100=20000 最大和为20000 sum/2=10000    n*sum/2=100W 我们的算法可以在一秒内解决
+     */
+    //2是false 1是true 0默认值
+    static int[][] pArr;
+
+    public static boolean canPartition(int[] nums) {
+
+        int len = nums.length;
+        if (len == 0)
+            return true;
+
+        int res = 0;
+        for (int i = 0; i < len; i++) {
+            res += nums[i];
+        }
+        if (res % 2 != 0)
+            return false;
+        pArr = new int[len][res + 1];
+        return partitionNum(nums, len - 1, res / 2);
+    }
+
+    private static boolean partitionNum(int[] nums, int index, int c) {
+        if (c == 0)
+            return true;
+        if (index < 0 || c < 0)
+            return false;
+
+        if (pArr[index][c] != 0) {
+            return pArr[index][c] == 1;
+        }
+
+        pArr[index][c] = partitionNum(nums, index - 1, c) || partitionNum(nums, index - 1, c - nums[index]) ? 1 : 2;
+
+        return pArr[index][c] == 1;
+    }
+
+    /**
+     * 动态规划 //TODO 基本上没有懂  这个看来还要再看2遍以上
+     */
+    public static boolean canPartitionDP(int[] nums) {
+
+        int len = nums.length;
+        if (len == 0)
+            return true;
+
+        int res = 0;
+        for (int i = 0; i < len; i++) {
+            res += nums[i];
+        }
+        if (res % 2 != 0)
+            return false;
+        int c = res / 2;
+
+        //这里用的是
+        boolean[] memo = new boolean[c + 1];
+        for (int i = 0; i <= c; i++) {
+            memo[i]=
+        }
+        for (int i = 1; i < len; i++) {
+            for (int j = 0; j < c; j++) {
+                pArr[i][j] =
+            }
+        }
+        return true;
+    }
+
+
     public static void main(String[] args) {
 //        PriorityQueue<Integer> p = new PriorityQueue<>();
 //        p.add(5);
@@ -834,6 +940,8 @@ public class Solution {
         int[] w = {2, 3, 1, 4};
         int[] v = {6, 5, 2, 8};
         System.out.println(knapsack01DP_OP(w, v, 5));
+
+        System.out.println(canPartition(w));
 
     }
 }
