@@ -577,12 +577,35 @@ public class Solution {
         if (C == 0)
             return 0;
 
-        return bestValue(w, v, lenW - 1, C);
+        //这里是C+1 因为我们的C是从1...C
+        bestArr = new int[lenW][C + 1];
+        return bestValue2(w, v, lenW - 1, C);
     }
 
     /**
      * 用 [index...len]的物品,填充容积为c的背包的最大价值 注意index不一定一定会遍历到0
      * 因为可能我们添加的第一元素重量正好填满我们容量C 那么
+     * <p>
+     * <p>
+     * //TODO 这个具体的递归过程是：以下面一组数据为例
+     * int[] w = {2, 3, 1, 4};
+     * int[] v = {6, 5, 2, 8};
+     * 首先我们的过程是 先判断w[index]这个物品我们是否放入背包中
+     * 通过程序我们一直不放入背包的f() 递归到index=0 res=0 然后此时我们看放入6 和不放入6 函数的值那个大 得到res=6
+     * <p>
+     * 向上回溯index=1：
+     * 5放入背包，再看index-1 放入和不放入背包的最大值，正好刚才我们求出 0最大时6 所以 5+6=11 c满了本次递归结束
+     * <p>
+     * 向上回溯index=2：
+     * 此时不放入w[2]=1 之前的价值是11 所以最后此次循环 返回res=11
+     * <p>
+     * 向上回溯index=3 此时之前的res==11：
+     * 放入w[index]=4  此时c==1放入后再递归：
+     * 一直到index==0 放入2 c不足跳过 res=0
+     * index=1 放入3  c不足跳过 res=0
+     * index=2 放入1 c满足  返回res=v[2]=2
+     * index=3 回到递归开始 8+2<11
+     * 最后res==11；
      *
      * @param w
      * @param v
@@ -590,6 +613,7 @@ public class Solution {
      * @param c
      * @return 返回c容量下 放入
      */
+
     private static int bestValue(int[] w, int[] v, int index, int c) {
         //当容量满的时候 递归终止
         //index表示下标我们传入的是len-1 保证合法性 此时如果index<0 那么直接返回
@@ -606,6 +630,171 @@ public class Solution {
         return res;
     }
 
+    /**
+     * 记忆化搜索
+     */
+    //这里我们用的是二位数组
+    static int[][] bestArr;
+
+    private static int bestValue2(int[] w, int[] v, int index, int c) {
+        //当容量满的时候 递归终止
+        //index表示下标我们传入的是len-1 保证合法性 此时如果index<0 那么直接返回
+        if (c <= 0 || index < 0) {
+            return 0;
+        }
+
+        if (bestArr[index][c] != 0) {
+            return bestArr[index][c];
+        }
+        //index元素不添加直接添加下一个元素 一直这样一直遍历 知道遍历到index=0
+        int res = bestValue2(w, v, index - 1, c);
+        if (c >= w[index]) {//添加index元素 然后继续和下一个元素比较去最大值
+            // v[index]添加入背包  bestValue(w, v, index - 1, c - w[index])看下一个元素 他们的总和  在与res比较
+            res = Math.max(res, v[index] + bestValue2(w, v, index - 1, c - w[index]));
+        }
+        bestArr[index][c] = res;
+        return res;
+    }
+
+    /**
+     * 0-1 背包问题 动态规划写法
+     */
+    //我们创建一个[len][C+1]二位数组
+    //行(len)表示物品重量w的下标
+    //列表示0...C 的容量
+    //[i][j]表示 在j容量下 在0..i范围内 能取到的最大价值
+    //那么最后[n-1][C]就是我们这个问题的解
+    static int[][] dpmemo;
+
+    public static int knapsack01DP(int[] w, int[] v, int C) {
+        int len = w.length;
+        if (len != v.length)
+            throw new IllegalArgumentException("参数不合法");
+        if (len == 0)
+            return 0;
+        if (C == 0)
+            return 0;
+
+        dpmemo = new int[len][C + 1];
+        //1. dp 先确定最小子问题的解 由分析得到当物品为0时 如下 TODO 详见笔记本
+        for (int i = 0; i <= C; i++) {
+            //当物品只考虑一个无论C多大 只要C能容下w[0]的重量 那么背包的最大机制就是 v[0]
+            dpmemo[0][i] = (i >= w[0] ? v[0] : 0);
+        }
+        //还有一个是当C=0时 无论len时几都为0 不过这里前面判断了 C=0直接return
+        // 同时数组默认时0 这个不写也没关系
+
+
+        //2. 分析写出递归函数
+        for (int i = 1; i < len; i++) {//当物品为i时 对应容量的变化可以取到的最大价值
+            for (int j = 0; j <= C; j++) {
+                //3. 开始根据状态转移写动态规划函数
+                //(1). [i][j]当容量为j 我们考虑到物品i时 我们不选择ta
+                dpmemo[i][j] = dpmemo[i - 1][j];
+                //(2).  [i][j]当容量为j 我们考虑到物品i时 我们选择ta
+                if (j >= w[i]) {
+                    dpmemo[i][j] = Math.max(dpmemo[i][j], v[i] + dpmemo[i - 1][j - w[i]]);
+                }
+            }
+        }
+
+        return dpmemo[len - 1][C];
+    }
+
+    /**
+     * 动态规划用的空间复杂度为O(n*C)
+     * 当物品非常多的情况下 这个空间可能会很大
+     * <p>
+     * 由我们的思路和代码可以看出
+     * 我们在判断的时候只用了i行和i-1行
+     * 所以我们可不可以只用2行来解决呢
+     * 这样就变成了O(2*C)=O(C)
+     * <p>
+     * <p>
+     * 答案是可以的
+     * //    -----------------------------
+     * //    i= 0  2  4  6  8
+     * //    -----------------------------
+     * //    i= 1  3  5  7  9
+     * //    -----------------------------
+     * 如上我们可以循环使用 当i=0 时 i=1存
+     * 当i=1 i=2直接存在原来i=0的位置 直接 “覆盖”
+     * 其他同理
+     */
+    //optimization
+    public static int knapsack01DP_OP(int[] w, int[] v, int C) {
+        int len = w.length;
+        if (len != v.length)
+            throw new IllegalArgumentException("参数不合法");
+        if (len == 0)
+            return 0;
+        if (C == 0)
+            return 0;
+
+        dpmemo = new int[2][C + 1];
+        //1. dp 先确定最小子问题的解 由分析得到当物品为0时 如下 TODO 详见笔记本
+        for (int i = 0; i <= C; i++) {
+            //当物品只考虑一个无论C多大 只要C能容下w[0]的重量 那么背包的最大机制就是 v[0]
+            dpmemo[0][i] = (i >= w[0] ? v[0] : 0);
+        }
+        //还有一个是当C=0时 无论len时几都为0 不过这里前面判断了 C=0直接return
+        // 同时数组默认时0 这个不写也没关系
+
+
+        //2. 分析写出递归函数
+        for (int i = 1; i < len; i++) {//当物品为i时 对应容量的变化可以取到的最大价值
+            for (int j = 0; j <= C; j++) {
+                //3. 开始根据状态转移写动态规划函数
+                //(1). [i][j]当容量为j 我们考虑到物品i时 我们不选择ta
+                dpmemo[i % 2][j] = dpmemo[(i - 1) % 2][j];
+                //(2).  [i][j]当容量为j 我们考虑到物品i时 我们选择ta
+                if (j >= w[i]) {
+                    dpmemo[i % 2][j] = Math.max(dpmemo[i % 2][j], v[i] + dpmemo[(i - 1) % 2][j - w[i]]);
+                }
+            }
+        }
+
+        return dpmemo[(len - 1) % 2][C];
+    }
+
+    /**
+     * 0-1背包问题继续空间优化
+     * 这次我们在knapsack01DP_OP
+     */
+    public static int knapsack01DP_OP2(int[] w, int[] v, int C) {
+        int len = w.length;
+        if (len != v.length)
+            throw new IllegalArgumentException("参数不合法");
+        if (len == 0)
+            return 0;
+        if (C == 0)
+            return 0;
+
+        dpmemo = new int[2][C + 1];
+        //1. dp 先确定最小子问题的解 由分析得到当物品为0时 如下 TODO 详见笔记本
+        for (int i = 0; i <= C; i++) {
+            //当物品只考虑一个无论C多大 只要C能容下w[0]的重量 那么背包的最大机制就是 v[0]
+            dpmemo[0][i] = (i >= w[0] ? v[0] : 0);
+        }
+        //还有一个是当C=0时 无论len时几都为0 不过这里前面判断了 C=0直接return
+        // 同时数组默认时0 这个不写也没关系
+
+
+        //2. 分析写出递归函数
+        for (int i = 1; i < len; i++) {//当物品为i时 对应容量的变化可以取到的最大价值
+            for (int j = 0; j <= C; j++) {
+                //3. 开始根据状态转移写动态规划函数
+                //(1). [i][j]当容量为j 我们考虑到物品i时 我们不选择ta
+                dpmemo[i % 2][j] = dpmemo[(i - 1) % 2][j];
+                //(2).  [i][j]当容量为j 我们考虑到物品i时 我们选择ta
+                if (j >= w[i]) {
+                    dpmemo[i % 2][j] = Math.max(dpmemo[i % 2][j], v[i] + dpmemo[(i - 1) % 2][j - w[i]]);
+                }
+            }
+        }
+
+        return dpmemo[(len - 1) % 2][C];
+    }
     public static void main(String[] args) {
 //        PriorityQueue<Integer> p = new PriorityQueue<>();
 //        p.add(5);
@@ -635,8 +824,16 @@ public class Solution {
 
 //        int[] nums = {2, 7, 9, 3, 1};
 //        System.out.println(rob2(nums));
-        int[] w = {1, 2, 3};
-        int[] v = {6, 10, 12};
-        System.out.println(knapsack01(w, v, 3));
+
+
+//        int[] w = {1, 2, 3};
+//        int[] v = {6, 10, 12};
+//
+//        System.out.println(knapsack01DP(w, v, 3));
+
+        int[] w = {2, 3, 1, 4};
+        int[] v = {6, 5, 2, 8};
+        System.out.println(knapsack01DP_OP(w, v, 5));
+
     }
 }
