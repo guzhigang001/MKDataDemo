@@ -871,7 +871,7 @@ public class Solution {
     }
 
     /**
-     * 动态规划 //TODO 基本上没有懂  这个看来还要再看2遍以上
+     * 动态规划 //TODO 基本上没有懂  这个看来还要再看2遍以上 同时要把322 377 474 139 494 这几个背包的类似问题页看了
      */
     public static boolean canPartitionDP(int[] nums) {
 
@@ -890,16 +890,62 @@ public class Solution {
         //这里用的是
         boolean[] memo = new boolean[c + 1];
         for (int i = 0; i <= c; i++) {
-            memo[i]=
+            memo[i] = nums[0] == i;
         }
         for (int i = 1; i < len; i++) {
-            for (int j = 0; j < c; j++) {
-                pArr[i][j] =
+            for (int j = c; j >= nums[i]; j--) {
+                memo[j] = memo[j] || memo[j - nums[i]];
             }
         }
-        return true;
+        return memo[c];
     }
 
+    /**
+     * 300. 最长上升子序列
+     * <p>
+     * 给定一个无序的整数数组，找到其中最长上升子序列的长度。
+     * <p>
+     * 示例:
+     * <p>
+     * 输入: [10,9,2,5,3,7,101,18]
+     * 输出: 4
+     * 解释: 最长的上升子序列是 [2,3,7,101]，它的长度是 4。
+     * <p>
+     * 说明:
+     * <p>
+     * 可能会有多种最长上升子序列的组合，你只需要输出对应的长度即可。
+     * 你算法的时间复杂度应该为 O(n2) 。
+     * <p>
+     * 进阶: 你能将算法的时间复杂度降低到 O(n log n) 吗?
+     */
+    public int lengthOfLIS(int[] nums) {
+        int len = nums.length;
+        if (len == 0 || len == 1) {
+            return len;
+        }
+
+        int[] memo = new int[len];
+        Arrays.fill(memo, 1);
+
+        return findLIS(nums, len, memo, 0);
+
+    }
+
+    /**
+     * 返回以当前nums[index]的字串个数
+     * @param nums  查找的数据源
+     * @param len   长度 不变
+     * @param memo  存nums每个位置中 以nums[i] 为结尾 的最长上升字串
+     * @param index 当前我们看到的元素
+     * @return
+     */
+    private int findLIS(int[] nums, int len, int[] memo, int index) {
+
+        if (index < 0)
+            return memo[index];
+
+        return 0;
+    }
 
     public static void main(String[] args) {
 //        PriorityQueue<Integer> p = new PriorityQueue<>();
