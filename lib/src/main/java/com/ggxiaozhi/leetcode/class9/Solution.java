@@ -927,25 +927,233 @@ public class Solution {
         int[] memo = new int[len];
         Arrays.fill(memo, 1);
 
-        return findLIS(nums, len, memo, 0);
+        for (int index = 1; index < len; index++) {
+            for (int j = 0; j < index; j++) {
+
+                if (nums[index] > nums[j]) {
+                    memo[index] = Math.max(memo[index], memo[j] + 1);
+                }
+            }
+        }
+
+        Arrays.sort(memo);
+        return memo[len - 1];
 
     }
 
     /**
-     * 返回以当前nums[index]的字串个数
-     * @param nums  查找的数据源
-     * @param len   长度 不变
-     * @param memo  存nums每个位置中 以nums[i] 为结尾 的最长上升字串
-     * @param index 当前我们看到的元素
+     * 贪心算法
+     * <p>
+     * 455. 分发饼干
+     * <p>
+     * 假设你是一位很棒的家长，想要给你的孩子们一些小饼干。但是，每个孩子最多只能给一块饼干。对每个孩子 i ，都有一个胃口值 gi ，这是能让孩子们满足胃口的饼干的最小尺寸；并且每块饼干 j ，都有一个尺寸 sj 。如果 sj >= gi ，我们可以将这个饼干 j 分配给孩子 i ，这个孩子会得到满足。你的目标是尽可能满足越多数量的孩子，并输出这个最大数值。
+     * <p>
+     * 注意：
+     * <p>
+     * 你可以假设胃口值为正。
+     * 一个小朋友最多只能拥有一块饼干。
+     * <p>
+     * 示例 1:
+     * <p>
+     * 输入: [1,2,3], [1,1]
+     * <p>
+     * 输出: 1
+     * <p>
+     * 解释:
+     * 你有三个孩子和两块小饼干，3个孩子的胃口值分别是：1,2,3。
+     * 虽然你有两块小饼干，由于他们的尺寸都是1，你只能让胃口值是1的孩子满足。
+     * 所以你应该输出1。
+     * <p>
+     * 示例 2:
+     * <p>
+     * 输入: [1,2], [1,2,3]
+     * <p>
+     * 输出: 2
+     * <p>
+     * 解释:
+     * 你有两个孩子和三块小饼干，2个孩子的胃口值分别是1,2。
+     * 你拥有的饼干数量和尺寸都足以让所有孩子满足。
+     * 所以你应该输出2.
+     *
+     * @param g 每个孩子的贪心值
+     * @param s 每块饼干的大小
+     * @return 能满足最多的孩子个数
+     */
+    public static int findContentChildren(int[] g, int[] s) {
+
+        int len = g.length;
+        int lens = s.length;
+        if (len == 0 || s.length == 0)
+            return 0;
+
+
+        Arrays.sort(g);
+        Arrays.sort(s);
+
+
+        int res = 0;
+        for (int i = len - 1; i >= 0; i--) {
+            if (lens == 0) {
+                break;
+            }
+            if (lens - 1 >= 0 && s[lens - 1] >= g[i]) {
+                res = res + 1;
+                lens = lens - 1;
+            }
+        }
+
+        return res;
+    }
+
+    /**
+     * 392. 判断子序列
+     * <p>
+     * 给定字符串 s 和 t ，判断 s 是否为 t 的子序列。
+     * <p>
+     * 你可以认为 s 和 t 中仅包含英文小写字母。字符串 t 可能会很长（长度 ~= 500,000），而 s 是个短字符串（长度 <=100）。
+     * <p>
+     * 字符串的一个子序列是原始字符串删除一些（也可以不删除）字符而不改变剩余字符相对位置形成的新字符串。（例如，"ace"是"abcde"的一个子序列，而"aec"不是）。
+     * <p>
+     * 示例 1:
+     * s = "abc", t = "ahbgdc"
+     * <p>
+     * 返回 true.
+     * <p>
+     * 示例 2:
+     * s = "axc", t = "ahbgdc"
+     * <p>
+     * 返回 false.
+     * <p>
+     * 后续挑战 :
+     * <p>
+     * 如果有大量输入的 S，称作S1, S2, ... , Sk 其中 k >= 10亿，你需要依次检查它们是否为 T 的子序列。在这种情况下，你会怎样改变代码？
+     *
+     * @param s
+     * @param t
      * @return
      */
-    private int findLIS(int[] nums, int len, int[] memo, int index) {
+    public static boolean isSubsequence(String s, String t) {
+        int len = s.length();
+        if (len == 0)
+            return true;
 
-        if (index < 0)
-            return memo[index];
+        if (t.length() == 0)
+            return false;
 
-        return 0;
+        //放置s和t==1 index == len - 1 =true
+        int index = -1;
+        for (int i = 0; i < t.length(); i++) {
+            if (index == len - 1)
+                break;
+            char c = t.charAt(i);
+            if (s.charAt(index + 1) == c) {
+                index++;
+            }
+
+        }
+        return index == len - 1;
     }
+
+
+    /**
+     * 435. 无重叠区间
+     * <p>
+     * 给定一个区间的集合，找到需要移除区间的最小数量，使剩余区间互不重叠。
+     * <p>
+     * 注意:
+     * <p>
+     * 可以认为区间的终点总是大于它的起点。
+     * 区间 [1,2] 和 [2,3] 的边界相互“接触”，但没有相互重叠。
+     * <p>
+     * 示例 1:
+     * <p>
+     * 输入: [ [1,2], [2,3], [3,4], [1,3] ]
+     * <p>
+     * 输出: 1
+     * <p>
+     * 解释: 移除 [1,3] 后，剩下的区间没有重叠。
+     * <p>
+     * 示例 2:
+     * <p>
+     * 输入: [ [1,2], [1,2], [1,2] ]
+     * <p>
+     * 输出: 2
+     * <p>
+     * 解释: 你需要移除两个 [1,2] 来使剩下的区间没有重叠。
+     * <p>
+     * 示例 3:
+     * <p>
+     * 输入: [ [1,2], [2,3] ]
+     * <p>
+     * 输出: 0
+     * <p>
+     * 解释: 你不需要移除任何区间，因为它们已经是无重叠的了。
+     * <p>
+     * 思路 使用动态规划思想:
+     * 参考300题
+     * 首先将问题转化，求移除区间的最小数量，可以转化成保留
+     * 那么我们可以通过判断每个子序列的start是否大于等于前一个子序列的end
+     * 如果满足 长度+1；
+     * <p>
+     * 但是 首先我们要对intervals排序 保证每个子序列中排序规则 start!=start 谁小谁在前
+     * start==start end谁下谁在前
+     * 这样
+     *
+     * @param intervals
+     * @return
+     */
+    public int eraseOverlapIntervals(int[][] intervals) {
+
+        if (intervals.length == 0)
+            return 0;
+
+        //排序 排序规则 start!=start 谁小谁在前
+        //start==start end谁下谁在前
+        intervals = sortIntervals(intervals);
+
+        //表示intervals每个位置保留的长度
+        int[] memo = new int[intervals.length];
+        //记录当intervals[i]是否要保留
+        //当intervals[0]时说明只有一个子序列 那么他和谁也不冲突 所以至少要保留1
+        Arrays.fill(memo, 1);
+        for (int i = 1; i < intervals.length; i++) {
+            for (int j = 0; j < i; j++) {
+                if (intervals[i][0] >= intervals[j][intervals[j].length - 1])
+                    memo[i] = Math.max(memo[i], 1 + memo[j]);
+            }
+        }
+        int res = 0;
+        for (int i = 0; i < memo.length; i++) {
+            res = Math.max(res, memo[i]);
+        }
+        return memo.length - res;
+    }
+
+    //利用冒泡排序 排列 冒泡排序时可以优化的
+
+    private int[][] sortIntervals(int[][] intervals) {
+        for (int i = 0; i < intervals.length - 1; i++) {
+            for (int j = 0; j < intervals.length - 1 - i; j++) {
+                if (intervals[j][0] != intervals[j + 1][0]) {//如果 两个子序列的start不相等
+                    if (intervals[j][0] > intervals[j + 1][0]) {//如果前面的start大 那么交换位置
+                        swap(intervals, j, j + 1);
+                    }//如果前面的start小 那么位置不变 符合要求
+                } else {//每个子序列的start相等 那么end谁小 谁在前面
+                    if (intervals[j][intervals[j].length - 1] > intervals[j + 1][intervals[j].length - 1]) {//如果前面的start大 那么交换位置
+                        swap(intervals, j, j + 1);
+                    }//如果前面的start小 那么位置不变 符合要求
+                }
+            }
+        }
+        return intervals;
+    }
+
+    private void swap(int[][] intervals, int i, int j) {
+        int[] temp = intervals[i];
+        intervals[i] = intervals[j];
+        intervals[j] = temp;
+    }
+
 
     public static void main(String[] args) {
 //        PriorityQueue<Integer> p = new PriorityQueue<>();
@@ -983,11 +1191,18 @@ public class Solution {
 //
 //        System.out.println(knapsack01DP(w, v, 3));
 
-        int[] w = {2, 3, 1, 4};
-        int[] v = {6, 5, 2, 8};
-        System.out.println(knapsack01DP_OP(w, v, 5));
+//        int[] w = {2, 3, 1, 4};
+//        int[] v = {6, 5, 2, 8};
+//        System.out.println(knapsack01DP_OP(w, v, 5));
+//
+//        System.out.println(canPartition(w));
 
-        System.out.println(canPartition(w));
+        int[] w = {1, 2, 3};
+        int[] v = {1, 1};
+        System.out.println(findContentChildren(w, v));
+
+
+        System.out.println(findContentChildren(w, v));
 
     }
 }
