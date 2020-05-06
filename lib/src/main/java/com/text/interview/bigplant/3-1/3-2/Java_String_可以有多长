@@ -1,0 +1,15 @@
+
+   Java String栈|
+   ●受字节码限制,字符串最终的MUTF-8字节数不超过65535
+   ●Latin字符,受Javac代码限制,最多65534个
+   ●非Latin字符最终对应字节个数差异较大,最多字节个数是65535
+   ●如果运行时方法区设置较小,也会受到方法区大小的限制
+   少奈课网
+
+
+Java String堆
+●受虚拟机指令限制,字符数理论上限为Integer.MAX VALUE
+●受虚拟机实现限制,实际上限可能会小于Integer.MAX_ VALUE
+●如果堆内存较小,也会受到堆内存的限制
+
+https://blog.csdn.net/qauchangqingwei/article/details/80831797
