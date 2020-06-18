@@ -1,6 +1,18 @@
 package com.ggxiaozhi.dataandcode.class2;
 
+import com.sun.javafx.scene.traversal.Algorithm;
+
+import java.security.InvalidKeyException;
+import java.security.Key;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.Arrays;
+
+import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 
 /**
  * Create by ggxz
@@ -36,9 +48,9 @@ public class Main {
     public static void main(String[] args) {
 
 
-        Integer[] integers = {3, 5, 4, 8, 2, 1};
-
-        selectSort(integers);
+//        Integer[] integers = {3, 5, 4, 8, 2, 1};
+//
+//        selectSort(integers);
 
         // 测试排序算法辅助函数
 //        int N = 2000;
@@ -49,4 +61,6 @@ public class Main {
 
 
     }
+
+
 }

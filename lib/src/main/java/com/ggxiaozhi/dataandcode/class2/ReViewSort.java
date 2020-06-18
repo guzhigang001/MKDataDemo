@@ -20,7 +20,7 @@ public class ReViewSort {
 //        System.out.println("bubbleSort1:" + Arrays.toString(bubbleSort1(array)));
 //        System.out.println("bubbleSort2:" + Arrays.toString(bubbleSort2(array)));
 //        System.out.println("cocktailSort1:" + Arrays.toString(cocktailSort1(array)));
-        System.out.println("shellSort:" + Arrays.toString(shellSort(array)));
+        System.out.println("shellSort:" + Arrays.toString(insertSort1(array)));
         System.out.println(binarySearch(array, 0,array.length-1,6));
     }
 
